@@ -1,0 +1,1083 @@
+---
+title: "Projektarbeit: Regressionsmodelle"
+subtitle: "Vorhersage des BIP pro Kopf"
+author: "Sebastian Wölk"
+date: "03.12.2020"
+output:
+ html_document:
+   code_folding: hide 
+   code_download: yes
+   fig_height: 4
+   fig_width: 4
+   number_sections: yes
+   toc: yes
+   toc_float:
+     collapsed: no
+     smooth_scroll: true 
+    
+   theme: paper
+   df_print: paged
+---
+
+```{css, echo=FALSE}
+
+/* css code to change the look of the HTML-output */
+  
+h1 {
+  color: #A2CD5A;
+  font-size: 200%;
+  }
+h2 {
+  color: #666666;
+  font-size: 150%;
+  }
+h3 {
+  font-size: 120%;
+  font-weight: bold;
+  }
+h4 {
+  color: rgb(139, 142, 150);
+  font-size: 100%;
+  font-weight: bold;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+       z-index: 2;
+       color: #fff;
+       background-color: #A2CD5A;
+       border-color: #337ab7;
+}
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+# Laden benötigter Pakete in R
+
+Im ersten Schritt laden wir notwendige Pakete mit Funktionen, die im Laufe des Projekts benötigen werden.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse) # Sammlung an sinnvollen und nützlichen Paketen für Data Science
+library(tidymodels) # Wichtige Pakete im Umfeld der Modellierung
+library(skimr) # Paket zur Zusammenfassung von DataFrames in ordentlicher Struktur
+library(corrplot) # Paket zur Analyse von Korrelationen
+library(psych) # Paket, insbesondere für einen Befehl für deskriptive Kennzahlen
+library(xgboost) # Notwendiges Paket zum Trainieren von Boosted Decision Trees (XGBoost)
+library(caret) # Notwendiges Paket zur Modellevaluation von XGBoost-Modellen
+library(glmnet) # Relevantes Paket für die Ridge- und Lasso Regressions
+```
+
+# Einleitung
+
+Im Rahmen dieser Arbeit wird mit dem Datensatz "world_indicator_2016_subset.csv" gearbeitet.
+
+Hierbei handelt es sich um einen Auszug eines Datensatzes der Weltbank. Er enthält Entwicklungsdaten unterschiedlicher Länder mit Angaben, wie z.B. der Bevölkerungszahl, der Geburten- und Sterberate, Angaben über den mit elektrischem Strom versorgten Bevölkerungsanteil, dem Anteil der ländlich und städtisch lebenden Bevölkerung, dem BIP (Bruttoinlandsprodukt) und viele mehr.
+
+Mit den einzelnen Variablen des hier behandelten Datensatzes werden wir uns im späteren Verlauf noch beschäftigen.
+
+# Business Understanding
+
+Anhand der uns vorliegenden Entwicklungsdaten unterschiedlicher Länder, soll das "BIP pro Kopf", als wesentlicher Indikator der Wirtschaftsleistung eines Landes, vorhergesagt werden. 
+
+Das Modell soll in der Lage sein, das "GDP_per_capita" (BIP pro Kopf) eines Landes anhand unterschiedlicher Variablen (Entwicklungsdaten) zu prognostizieren.
+
+Hierfür werden im späteren Verlauf dieses Notebooks mehrere Regressionsmodelle trainiert, um mit ihnen Vorhersagen zum BIP pro Kopf aus neuen Daten abzuleiten.
+
+In der Evaluationsphase der Modelle wird die Performance und Güte der Regressionsmodelle  mit bekannten Parametern für Regressionsmodelle, vorrangig dem RMSE und dem R², gemessen und verglichen.
+
+Es gilt, aus den verwendeten Algorithmen, das für die vorliegenden Daten am besten geeignete Modell zur Vorhersage des BIP pro Kopf (GDP_per_capita) zu identifizieren.
+
+# Data Understanding
+
+## Import the data
+```{r message=FALSE, warning=FALSE}
+WDI <- read_csv("https://raw.githubusercontent.com/kirenz/datasets/master/worldbank_indicator_2016_subset.csv")
+```
+ 
+Die benötigten Datensatz habe ich in dem R-Objekt "WDI" gesepeichert.
+Beim Importieren der Daten wurde bereits ein leerer Spaltenname automatisch mit "X1" benannt.
+
+## Datenstruktur
+
+```{r}
+# Überblick über die Daten verschaffen
+glimpse(WDI)
+
+```
+Der vorliegende Datensatz besteht aus 13 Spalten und 184 Zeilen.
+Der Datentyp von 12 von 13 Variablen ist "double".
+Lediglich die Variable "country" ist eine Variable vom Typ "character" und damit nicht numerisch.
+
+Überprüfung der Einzigartigkeit der ID's, um doppelte Datensätze zu vermeiden:
+```{r}
+length(unique(WDI$X1)) # Überprüfung der Einzigartigkeit der ID's, um doppelte Datensätze zu vermeiden.
+```
+
+Die Anzahl der einzigartigen ID's ist identisch mit der Anzahl Zeilen im Datensatz. Dementsprechend gibt es keine doppelten Einträge.
+
+Schauen wir im nächsten Schritt kurz nach, ob sich innerhalb der Variablen leere Felder befinden.
+
+```{r}
+skim(WDI) # Überprüfung, ob sich in den Variablen fehlende Daten verstecken.
+```
+
+Keine der Variablen im Datensatz enthält fehlende Einträge.
+
+## Datenvorbereitung
+
+Die nominale Variable "country" als Factor mit einem numerischen Wert zu labeln, erleichtert u.U. die weitere Arbeit mit verschiedenen Modellen.
+
+```{r}
+WDI$country <- as.factor(WDI$country) # Umwandlung der Spalte "country" in eine Faktorvariable.
+```
+
+Die Spalte x1 wird im weiteren Verlauf nicht benötigt, daher löschen wir diese aus dem Datensatz.
+```{r}
+WDI$X1 <- NULL # Entfernen der Spalte "X1" vom Objekt "WDI"
+```
+
+Ziel dieser Arbeit ist es, das BIP pro Kopf eines Landes anhand vorliegender Entwicklungsdaten zu prognostizieren. Hierfür muss die Variable "BIP pro Kopf" noch erstellt werden.
+Das realisiere ich wie folgt:
+
+```{r}
+WDI <- mutate(WDI, GDP_per_capita = GDP/Population) # Hinzufügen der Spalte "BIP pro Kopf" zum vorhandenen Datensatz.
+
+head(WDI) ### Ausgabe der ersten 6 Zeilen des Datensatzes
+
+glimpse(WDI)
+```
+
+## Trainings- und Testdaten
+
+Teilen wir unseren Datensatz zunächst in einen Trainings- und einen Testteil auf.
+
+```{r}
+set.seed(123) # Zufallszahlengenerator für die Ziehung von Trainings- und Testdaten - zur Sicherstellung, dass bei jeder Ziehung die gleichen zufälligen Test- und Trainingssets generiert werden. Andernfalls würden sich die Trainings- und Testdaten bei jeder Ziehung unterscheiden.
+
+WDI_split <- initial_split(WDI) # zufällige Splittung des Datensatzes inkl. Ablage in einem separaten Objekt in R.
+WDI_train <- training(WDI_split) # Extrahierung eines Trainingssets inkl. Speicherung eines eigenen Objekts.
+WDI_test <- testing(WDI_split) # Extrahierung eines Testsets inkl. Speicherung eines eigenen Objekts.
+
+```
+
+Fortlaufend wird vorrangig mit dem Objekt "WDI_train", welches den Extrakt der zufällig generierten Trainingsdaten aus dem Datensatz "WDI" beinhaltet, weitergearbeitet. 
+
+Wir schauen uns die Testdaten im weiteren Verlauf (Training der Modelle) nicht an.
+
+## Datenanalyse
+
+Bei der Analyse der Daten mithilfe deskriptiver und explorativer Statistik verwenden wir eine Kopie des Trainingssets. 
+
+```{r}
+WDI_expl <- WDI_train # Erstellen einer Kopie der Trainingsdaten für die weitere Datenanalyse
+```
+
+### Deskriptive Analyse
+
+Neben der Angabe, ob der Datensatz fehlende Werte beinhaltet, gibt die Funktion skim() noch weit mehr interessante Kennzahlen der deskriptiven Statistik aus.
+
+```{r}
+skim(WDI_expl) # Ausgabe unterschiedlicher deskriptiver Statistiken für jede Variable.
+```
+
+**Erkenntnise:**  
+
+* Keine fehlenden Werte (s.o.)  
+* Arithmetisches Mittel und Median zu jeder numerischen Variable kann abgelesen werden 
+* Standardabweichung jeder numerischen Variable (Durchschnittliche Entfernung der Merkmale zum Mittelwert)  
+* Perzentile:  
+  P25 = 25% aller Merkmale der Variable liegen unter diesem Wert bzw. 75% darüber.    
+  P50 = 50% aller Merkmale der Variable liegen unter diesem Wert (Median).  
+  P75 = 75% aller Merkamle der Variable liegen unter diesem Wert bzw. 25% darüber. 
+  
+
+Eine weitere Möglichkeit der Ausgabe deskriptiver Statistiken zu den einzelnen Variablen ist die Funktion describe().
+
+```{r}
+describe(WDI_expl) # Ausgabe unterschiedlicher deskriptiver Statistiken für jede numerische Variable.
+```
+
+Neben dem arithmethischen Mittel, dem Median und der Standardabweichung gibt uns diese Funktion noch weitere Kennzahlen der deskriptiven Statistik aus. Auf einige der ausgegebenen Kennzahlen der deskriptiven Statistik werde ich nun etwas genauer eingehen.
+
+* Arithmetisches Mittel: Summe aller Merkmalsausprägungen dividiert durch die Anzahl der Merkmalsausprägungen einer Variable
+* Median: Wert in der Mitte der aufsteigend sortierten Merkmalsausprägungen.  
+* Min/Max/Range: Spannweite der Werte einer Variable (Range = Differenz zw. Min und Max)
+* Schiefe (skew):   
+  < 0 = Verteilung linksschief,   
+  > 0 = Verteilung rechtsschief,  
+  0 = Verteilung absolut symmetrisch  
+* Kurtosis:  
+  < 0 = flacher Kurvenverlauf (flachgipflig)  
+  > 0 = steiler Kurvenverlauf (steilgipflig)  
+  0 = normalgipflig  
+
+Die Variable "Country" ist hier als Faktorvariable nicht näher zu betrachten.
+
+Schauen wir uns beispielhaft 4 Variable und einige Kennzahlen der deskriptiven Statistik genauer an.
+
+**Population**: Das arithmetische Mittel der Bevölkerungsanzahl liegt bei 43,258,430, während der Median bei 8,229,165 liegt. Diese beiden Werte zeigen bereits, dass es sich bei der Bevölkerungszahl der einzelnen Länder um eine stark rechtsschiefe Verteilung handelt, was die Schiefe mit 7,19 noch einmal unterstreicht. Das arithmetische Mittel wird an dieser Stelle stark durch Ausreißer nach oben beeinflusst.
+
+**Internet_User_pp**: Durchschnittlich sind 51,5% der Bevölkerung eines Landes in unserem Datensatz an das Internet angebunden. D er Median liegt bei 54,8%, was mit einer Schiefe von -1,29 auf eine leicht linksschiefe Verteilung hindeutet. Außerdem ist hier die Range i.H.v. 96,3 Prozentpunkten sehr groß. Einige Länder haben also nahezu gar keinen Zugang zum Internet, andere dagegen sind zu fast 100% mit Internet versorgt.
+
+**GDP**: Eine interessante Variable, im Vergleich unterschiedlicher Länder zueinander, ist das GDP. Mit einer Schiefe von 7,37 ist es in unserem Datensatz stark rechtsschief verteilt. Das bedeutet, dass es weitaus mehr Länder mit sehr geringem GDP gibt. Die Standardabweichung (durchschnittliche Abweichung zum Mittelwert des GDP) beträgt im Datensatz 1,933,142,000,000 und das ist ein norm hoher Wert und zeigt, wie unterschiedlich der Wohlstand in den im Datensatz enthaltenen Ländern zu sein scheint.
+
+**Acc_2_Electricty**: Als letzte Variable schauen wir uns den mit elektrischem Strom versorgten Bevölkerungsanteil in % an. Eine deutlich erkennbare linksschiefe Verteilung (Schiefe: -1.54) bedeutet, dass die allermeisten Länder flächendeckend mit Strom versorgt zu sein scheinen, es allerdings doch einige Ausreißer nach unten gibt. Die durchschnittliche Abweichung zum Mittelwert der Variable beträgt hier 26,5%, was im Hinblick auf die Versorgung mit Strom für uns ein unvorstellbares Bild ist. Denn ohne Strom, kann man sich ein Leben kaum noch vorstellen. Dennoch scheint es mit einer Range von 92,4 Prozentpunkten enorme Unterschiede in den jeweiligen Ländern, was die Stromversorgung der Bevölkerung angeht, zu geben. Doe Kurtosis von 0,988 weist auf einen sehr steilen Kurvenverlauf hin - es scheint also um einzelne Länder zu gehen, die diese Extremwerte darstellen.
+
+### Explorative Analyse
+
+Im Rahmen der explorativen Analyse schauen wir uns einige Variablen des vorliegenden Datensatzes und deren Verteilung einfach grafisch (in Form von Plots) an.
+
+Wir fangen mit der "Response"-Variable (GDP_per_capita) an.
+
+```{r}
+
+ggplot(WDI_expl, aes(x = GDP_per_capita)) + 
+  geom_histogram(fill = "#A2CD5A", bins=10) + 
+  theme_light() +
+  scale_x_continuous(labels = scales::comma) +
+  ggtitle("Verteilung des BIP pro Kopf") + 
+  xlab("BIP pro Kopf") + 
+  ylab("Anzahl")
+
+```
+
+In diesem Plot  fällt deutlich auf, dass es sich bei der Verteilung des BIP pro Kopf um eine stark rechtsschiefe Verteilung handelt.
+Sehr viele Länder haben ein BIP pro Kopf von unter $25,000. 
+Nur sehr wenige Länder haben eine Merkmalsausprägung von >$50,000 beim BIP pro Kopf.
+
+```{r}
+ggplot(WDI_expl, aes(x = "", y = GDP_per_capita)) +
+  geom_boxplot(fill = "#A2CD5A") +
+  theme_light() + 
+  ggtitle("Verteilung des BIP pro Kopf") + 
+  ylab("BIP pro Kopf")
+
+```
+
+Die Boxplot-Darstellung bestätigt an dieser Stelle noch einmal die rechtsschiefe Verteilung der Merkmalsausprägungen der Variable "BIP pro Kopf".  
+Der untere Whisker zeigt, dass die unteren 25% aller Werte zum BIP pro Kopf sehr nah beinander liegen. Wohingegen die oberen 25% aller Werte sehr breit gestreut sind - mit einigen Ausreißern, bis hin zu einem BIP pro Kopf von $100,000.  
+75% aller Werte beim BIP pro Kopf in unseren Trainingsdaten liegen unter einem Wert von ca. $15,000. Die oberen 25% der Werte für das BIP pro Kopf reichen von ca. $15,000 bis hin zu $100,000.  
+
+Schauen wir uns im nächsten Schritt die Bevölkerungszahl (Population) und dessen Verteilung einmal an.
+
+```{r}
+ggplot(WDI_expl, aes(x = Population/1000)) +
+  geom_histogram(fill = "#A2CD5A", bins = 15) +
+  scale_x_continuous(labels = scales::comma)+
+  ggtitle("Verteilung der Bevölkerungsanzahl")+
+  xlab("Bevölkerung pro 1000") + 
+  ylab("Anzahl") + 
+  theme_light()
+
+```
+
+Nicht nur das BIP pro Kopf, sondern auch die Bevölkerungsanzahl der jeweiligen Länder im betrachteten Datensatz ist stark rechtsschief verteilt. An dieser Stelle fallen aber einige Ausreißer am äußeren Rand der x-Achse (jenseits der 1 Mrd. Einwohner) auf.
+Mich interessiert, welche Länder das sind, die hier so hervorstechen und die rechtsschiefe Verteilung der Varible Population stark verschärfen:
+
+```{r}
+WDI_expl%>% 
+  filter(Population > 250000000)
+```
+
+Es sind die Länder China und Indien, die mit großem Abstand auf die USA mit einer Bevölkerungszahl von mehr als 1 Mrd. Menschen folgen.
+  
+Mögliche weitere interessante Variablen und dessen Verteilung könnten sein: 
+
+* Birth_rate  
+* Death_rate  
+* Acc_2_Electricity  
+* Internet_User_pp
+
+Auf die Darstellung im Rahmen der explorativen Statistik wird bei folgenden Variablen verzichtet, da die Summe der Ausprägungen beider Variablen auf 100% (Gesamtbevölkerung) hinausläuft und diesen Variablen auch im weiteren Verlauf dieser Arbeit, aufgrund der zu erwartenden 100%-Korrelation zueinander, keine größere Bedeutung zukommt.
+
+* Urban_Pop_pp  
+* Rural_Pop_pp
+
+Fahren wir also mit der Birth_rate als Variable fort.
+Die Geburtenrate ist in unserem Datensatz pro 1000 Einwohner gemessen worden.
+
+```{r}
+ggplot(WDI_expl, aes(x = Birth_rate)) + 
+  geom_histogram(fill = "#A2CD5A", bins = 10) + 
+  ggtitle("Verteilung der Geburtenrate") +
+  xlab("Geburtenrate pro 1000 Einwohner") +
+  ylab("Anzahl") + 
+  theme_light()
+```
+
+Die Geburtenrate der betrachteten Länder sieht rechtsschief verteilt aus.
+Viele Länder weisen eine, im Verhältnis, eher unterdurchschnittliche Geburtenrate auf. Nur einige wenige Länder haben Geburtenraten von 25 Geburten pro 1000 Einwohner oder mehr.
+
+```{r}
+ggplot(WDI_expl, aes(x = Death_rate)) + 
+  geom_histogram(fill = "#A2CD5A", bins = 10) + 
+  ggtitle("Verteilung der Todesrate") + 
+  xlab("Todesrate pro 1000 Einwohner") +
+  ylab("Anzahl") + 
+  theme_light()
+```
+
+Bei der "Deah_rate", ebenfalls gemessen in Todesfälle pro 1000 Einwohner eines Landes, zeichnet sich ein anderes Bild ab. Hier können wir zwar noch nicht von einer perfekten Normalverteilung sprechen, allerdings ist die Schiefe der Verteilung in dieser Variable nicht ganz so stark ausgeprägt, wie in den vorherigen Plots anderer Variablen. Wir haben eine leicht rechtsschiefe Verteilung, die einer Normalverteilung aber schon sehr nahe kommt.
+
+Interessant wäre jetzt zu sehen, inwieweit das BIP pro Kopf (GDP_per_capita) und die Todesrate (Death_rate) zusammenhängen.
+Hierfür schauen wir uns einmal die Entwicklung der Todesrate eines Landes in Abhängigkeit vom BIP pro Kopf an.
+
+```{r}
+ggplot(WDI_expl, aes(x = GDP_per_capita, y = Death_rate)) + 
+  geom_point(color = "#A2CD5A") + 
+  ggtitle("Todesrate in Abhängigkeit vom BIP pro Kopf") + 
+  xlab("BIP pro Kopf") + 
+  ylab("Todesrate pro 1000 Einwohner") + 
+  theme_light()
+```
+
+Es lässt sich an diesem Scatterplot erkennen, dass es keinen systematischen Zusammenhang zwischen der Todesrate und der Wirtschaftsleistung pro Kopf (BIP pro Kopf) zu geben scheint. Es gibt zwar mehr arme Länder in denen auch die Todesrate sehr hoch ist, allerdings ist die Streuung der Todesrate bei den armen Ländern ebenfalls sehr breit. Intuitiv würde man an dieser Stelle vielleicht von einem stärkeren Zusammenhang (wo kein Geld, da mehr Tote) ausgehen. Eine Erkenntnis, die uns die späteren Korrelationstests mit großer Sicherheit noch einmal bestätigen werden.
+
+```{r}
+ggplot(WDI_expl, aes(x = "", y = Acc_2_Electricity)) + 
+  geom_boxplot(fill = "#A2CD5A") + 
+  ggtitle("Verteilung der Bevölkerung mit Strom in %") +
+  ylab("%-Anteil der Bevölkerung mit eletrischem Strom") + 
+  theme_light()
+```
+
+Bei der Variable "Acc_2_Electricty" handelt es sich um eine Variable, die in relativen Werten (pro 100) ausgedrückt ist. Sie gibt Auskunft über den relativen Anteil der Bevölkerung (in %), der mit elektrischem Strom versorgt ist. Hier zeichnet sich eine stark linksschiefe Verteilung ab. Im Median ist die Bevölkerung der hier betrachteten Länder also zu 100% mit elektrischem Strom versorgt. Dennoch gibt es einige Ausreißer nach unten - zu sehen an der Länge des unteren Whiskers, der die Merkmalsausprägungen der untersten 25% aller Werte anzeigt, und den Ausreißern unter diesem Whisker. Jeder Punkt stellt in diesem Fall jeweils ein Land dar.
+
+Gibt es einen erkennbaren Zusammenhang zwischen der Versorgung mit elektrischem Strom und dem GDP_per_capita?
+
+```{r}
+ggplot(WDI_expl, aes(x = Acc_2_Electricity, y = GDP_per_capita)) + 
+  geom_point(color = "#A2CD5A") + 
+  ggtitle("BIP pro Kopf in Abhängigkeit vom Bevölkerungsanteil mit elektrischem Strom") +
+  xlab("%-Anteil mit elektrischem Strom versorgter Bevölkerung") + 
+  ylab("BIP pro Kopf") + 
+  theme_light()
+```
+
+Ein Zusammenhang ist erkennbar, allerdings wäre eine seriöse Vorhersage des BIP pro Kopf allein mit dem Predictor "Acc_2_Electricity" nicht möglich. Je höher das BIP pro Kopf eines Landes ausfällt, desto weniger scheint es sich in Abhängigkeit vom relativen Anteil der mit elektrischem Strom versorgten Bevölkerung zu entwickeln. Ergo: Die Streuung des BIP pro Kopf nimmt mit steigendem Anteil der Elektrifizierung zu.
+
+```{r}
+ggplot(WDI_expl, aes(x = Internet_User_pp)) + 
+  geom_histogram(fill = "#A2CD5A", bins = 4) + 
+  ggtitle("Verteilung des %-Anteils: Bevölkerung mit Internet") + 
+  xlab("%-Anteil der mit Internet versorgten Bevölkerung") +
+  ylab("Anzahl") + 
+  theme_light()
+```
+
+Auch bei dieser Variable handelt es sich um einen relativen Wert. Sie gibt den relativen Anteil der Bevölkerung mit Internerzugang in % an.
+Die Verteilung ist sehr ungleichmäßig. Es handelt sich um eine leicht linksschiefe, eher flachgipflige, Verteilung der Werte (die Verdichtung des Histogramms auf "bins = 4" erleichtert die Analyse der hier gezeigten Verteilung).
+
+Besteht denn hier ein Zusammenhang zum GDP_per_capita?
+
+```{r}
+ggplot(WDI_expl, aes(x = Internet_User_pp, y = GDP_per_capita)) + 
+  geom_point(color = "#A2CD5A") +
+  ggtitle("BIP pro Kopf in Abhängigkeit vom %-Anteil der Bevölkerung mit Zugang zum Internet") + 
+  xlab("%-Anteil der mit Internet versorgten Bevölkerung") + 
+  ylab("BIP pro Kopf") + 
+  theme_light()
+```
+
+Ein systematischer Zusammenhang ist in jedem Fall vorhanden, wenn auch nicht linear. Der Verlauf dieses Punktediagramms ist eher exponentiell. Das bedeutet, dass das BIP pro Kopf exponentiell stark in Abhängigkeit von der relativen Anzahl der Internetnutzer eines Landes ansteigt. Intuitiv hätte man hier schon einen positiven Zusammenhang in irgendeiner Form erwartet. Bei den späteren Korrelationstests wird sich diese Erkenntnis aus den Plots mit großer Wahrscheinlichkeit bestätigen.
+
+Nun haben wir die Variablen "Internet_User_pp", "Death_rate" und die "Acc_2_Electricity" schon gegen die Response-Variable geplottet.
+Um das ganze zu vereinfachen und jede numerische Variable in schlanker Art und Weise einmal gegen die Response-Variable zu plotten, bietet sich folgende Funktion an.
+
+```{r}
+WDI_expl2 <- WDI_expl[sapply(WDI_expl, is.numeric)] # Erstellung eines Datensatzes mit nur numerischen Variablen
+
+pairs(WDI_expl2) # Plottet alle numerischen Variablen gegeneinander
+
+```
+
+*Anmerkung*: Leider ist die Lesbarkeit des Plots im HTML Format nicht besonders gut. Dies ist der Anzahl der numerischen Variablen geschuldet.
+
+Hierbei wird vor allem deutlich, dass insbesondere die Variablen Birth_rate, Urban_Pop_pp, Rural_Pop_pp, Internet_User_pp und Server einen in irgendeiner Form systematischen Zusammenhang zur Response-Variable GDP_per_capita aufzeigen.
+
+Für eine genauere Betrachtung, insbesondere auch zur Analyse der Stärke des Zusammenhangs einzelner Variablen, ermitteln wir im nächsten Schritt die Korrelationskoeffizienten einzelner Variablen zueinander.
+
+## Analyse von Korellationen 
+Im vergangenen Unterkapitel haben wir uns mit einzelnen Variablen und und deren Verteilungen beschäftigt. An der einen oder anderen Stelle (Internet_User_pp, Acc_2_Electricity, Death_rate) haben wir uns bereits Zusammenhänge einzelner Variablen mit der im Rahmen dieser Arbeit definierten Response_Variable "GDP_per_capita" angeschaut. 
+Mit pairs() haben wir einen guten Überblick über weitere mögliche Zusammenhänge/Korrelationen zur Response-Variable erhalten.
+
+Dabei ist aufgefallen, dass die Todesrate eines Landes augenscheinlich nicht in Zusammenhang mit dem BIP pro Kopf eines Landes steht bzw. auf jeden Fall keinen signifikaten Zusammenhang aufweist aus dem sich eine Prognose ableiten lassen würde.
+
+Gleichzeitig ist aber aufgefallen, dass der Anteil der mit elektrischem Strom versorgten Bevölkerung schon einen zusammenhang zum BIP pro Kopf aufzuweisen scheint. Gleiches trifft auf auf den Zusammenhang zwischen der ans Internet angebundenen Bevölkerung in % zur Gesamtbevölkerung (Internet_User_pp) und der Entwicklung des BIP pro Kopf zu. Hier ist der Zusammenhang etwas stärker, nicht linear - tendenziell exponentiell steigend.
+
+Ebenso wurde ersichtlich, dass die Birth_rate (negativ) und Server (positiv) in irgendeiner Form mit unserer Response-Variable zusammenhängen.
+
+Um das Thema der Zusammenhänge genauer zu betrachten, Schauen wir uns hierzu einmal die Korrelationen aller Variablen zueinander an.
+Dies mache ich zunächst tabellarisch (nach Spearman und Pearson) und anschließend in Form von Corrplots (ebenfalls nach Spearman und Pearson).
+
+```{r}
+cor1 <- 
+  WDI_expl %>% # Auswahl der Kopie der Trainingsdaten
+  select(-country) %>% # Ausschluss der Variable country (Faktorvariable)
+  cor(method = "pearson") # Berechnung der Korrelationskoeffizienten
+  
+cor1 # Anzeige der Korrelationskoeffizienten nach Pearson
+
+cor2 <- 
+  WDI_expl %>% 
+  select(-country) %>% 
+  cor(method = "spearman")
+
+cor2 # Anzeige der Korrelationskoeffizienten nach Spearman
+```
+
+```{r}
+cor1 %>%
+  {.[order(abs(.[, 1]), decreasing = TRUE), 
+      order(abs(.[, 1]), decreasing = TRUE)]} %>%
+    corrplot(method = "circle", type = "upper", tl.col = "black")
+
+cor2 %>%
+  {.[order(abs(.[, 1]), decreasing = TRUE), 
+      order(abs(.[, 1]), decreasing = TRUE)]} %>%
+    corrplot(method = "circle", type = "upper", tl.col = "black")
+```
+
+Sowohl aus den Plots, als auch den tabellarischen Darstellungen, lassen sich gewisse Abhängigkeiten zur Response-Variable "GDP_per_capita" erkennen.
+Der stärkste potentielle Prädikator ist die Variable "Internet_User_pp", die einen Korrelationskoeffizienten (Pearson) von 0,7085 und einen Korrelationskoeffizienten nach Spearman i.H.v. 0,893 aufweist und damit dem wünschenswerten Wert von 1 schon sehr nahe kommt.
+
+An dieser Stelle ist die Verwendung der Spearman-Korrelation besser geeignet. Das liegt daran, dass ein systematischer Zusammenhang zwischen "Internet_User_pp" und "GDP_per_capita" existiert, dieser aber nicht linear ist (s.o.). Die Spearman-Korrelation ist, neben ihrer geringeren Sensivität gegenüber Outliern, auch in der Lage nicht-lineare Zusammenhänge zu erfassen. Der Pearson-Korrelationskoeffizient hingegen ist nur in der Lage wirklich lineare Zusammenhänge zu erfassen und wird stark durch Outlier beeinflusst.
+
+Einen relativ starken Zusammenhang zum BIP pro Kopf, als Response-Variable, weisen insgesamt folgende potentielle Prediktoren auf: 
+
+* Birth_rate: Relativ starker, negativer Zusammenhang  
+* Acc_2_Electricity: Relativ starker, positiver Zusammenhang
+* Rural_Pop_pp: Relativ starker, negativer Zusammenhang  
+* Urban_Pop_pp: Relativ starker, positiver Zusammenhang  
+* Server: Sehr starker, positiver Zusammenhang
+* Internet_User_pp: Sehr starker, positiver Zusammenhang  
+
+An dieser Stelle ist anzumerken, dass die Variablen "Rural_Pop_pp" und "Urban_Pop_pp"  zueinander eine Korrelation von 1  haben. Beide Variablen in einem Modell zusammen zu integrieren, würde demnach wenig Sinn machen. Beide Variablen als Prediktoren in einem Modell zu verwenden, würde ihre Erkärungskraft für unsere Response-Variable aufheben.
+
+Schauen wir uns zuerst die Korrelation aller potentiellen Prediktoren, mit entsprechend starkem Zusammenhang, zur Response-Variable an (Rural_Pop_pp und Urban_Pop_pp werden hier nicht weiter berücksichtigt):
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp + WDI_expl$Birth_rate + WDI_expl$Acc_2_Electricity + WDI_expl$Server , WDI_expl$GDP_per_capita, method = "pearson") # Korrelationstest (Pearson) mit allen Variablen, die einen mittleren bis starken Zusammehang zur Response Variable aufweisen.
+```
+
+Es liegt ein brauchbarer linearer Zusammenhang vor.
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp + WDI_expl$Birth_rate + WDI_expl$Acc_2_Electricity + WDI_expl$Server , WDI_expl$GDP_per_capita, method = "spearman") # Ermittlung des Korrelationskoeffizienten nach Spearman
+```
+
+Der Korrelationskoeffizient nach Spearman weist einen deutlich  besseren Zusammenhang dieser Variablen zur Response-Variable aus. Dies ist auf die geringere Sensibilität des Spearman's rho auf Outlier und auf die Fähigkeit dieser Methode, auch nicht-lineare Zusammenhänge erfassen zu können, zurückzuführen.
+Wir wir in den Plots mit der Funktion pairs() bereits gesehen haben, sind die allermeisten Zusammenhänge zur Variable GDP_per_capita eben nicht linear.
+
+Wir entfernen nun eine Variable nach der anderen aus dem Korrelationstest, um die Stärke des Einflusses einzelner Variablen auf die Korrelation für ein potentielles Modell zu überprüfen. Die Hinzunahme einer Variable, die nur einen minimalen Effekt auf den gesamten Korrelationskoeffizienten mit sich bringt, muss nicht zwingend in ein Modell integriert werden, da Modellkomplexität und die Auswirkung für die Güte eines potentiellen Modells vermutlich in keinem guten Verhältnis stehen würden.
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp+ WDI_expl$Birth_rate + WDI_expl$Acc_2_Electricity, WDI_expl$GDP_per_capita, method = "pearson")
+```
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp+ WDI_expl$Birth_rate + WDI_expl$Acc_2_Electricity, WDI_expl$GDP_per_capita, method = "spearman")
+```
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp + WDI_expl$Birth_rate, WDI_expl$GDP_per_capita, method = "pearson")
+```
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp + WDI_expl$Birth_rate, WDI_expl$GDP_per_capita, method = "spearman")
+```
+
+```{r}
+cor.test(WDI_expl$Internet_User_pp, WDI_expl$GDP_per_capita, method = "pearson")
+```
+```{r}
+cor.test(WDI_expl$Internet_User_pp, WDI_expl$GDP_per_capita, method = "spearman")
+```
+
+Der Korrelationskoeffizient der Variable "Internet_User_pp" liegt bei 0,709 nach Pearson und bei 0,893 nach Spearman. Dies entspricht dem Ergebnis aus den oben erstellten Korrelationstabellen und den erstellten Corrplots. 
+
+Durch Hinzufügen weiterer Prediktoren wird kein großer Effekt im Korrelationskoeffizienten nach Pearson erzielt. 
+Der Korrelationskoeffizient nach Spearman hingegen liefert zwar den besten Korrelationskoeffizienten (hier: 0,906), wenn alle stark korrelierenden Variablen als Prediktoren berücksichtigt werden. Allerdings ist der Effekt auf den Korrelationskoeffizienten auch bei der Spearman-Methode nicht besonders groß. Der stärkste Einzelprediktor ist - sowohl in den Korrelationstests nach Pearson, als auch nach Spearman - die Variable "Internet_User_pp" mit einem Korrelationskoeffizienten von 0,893.
+
+Außerdem lohnt es sich an dieser Stelle kurz darauf hinzuweisen, dass die mit dem BIP pro Kopf korrelierenden Variablen "Acc_2_Electricity", "Birth_rate" und "Server" und "Internet_User_pp" ebenfalls - teilweise stark -  eine Korrelation zueinander aufweisen (s. dazu auch Corrplots). Dadurch konzentriert sich die wirkliche  Erklärungskraft der Prediktoren letztlich auf eine wesentliche Variable.
+
+Im weiteren Verlauf werden wir unsere Regressionsmodelle demnach ausschließlich auf die Variable "Internet_User_pp" trainieren, die nach Spearman bereits eine Korrelation zum BIP pro Kopf von 0,89 aufweist.
+
+# Modellierung
+
+Im folgenden werden vier verschiedene Regressionsmodelle für eine Vorhersage des "GDP_per_capita" verwendet.
+
+* Lineare Regression  
+* Natural Spline  
+* XG Boost  
+* Lasso Regression
+
+## K-fold cross-validation
+
+Um letztendlich das beste Modell für unsere Daten zu identifizieren , verwende ich die K-fold cross-validation, die beim Trainieren und in der Evaluation der Modelle von Relevanz ist. Besonders interessant ist die k-fold cross-validation als Methode, wenn mehrere Modelle des gleichen Algorithmus trainiert wurden, um anschließend das jeweils beste Modell mit der k-fold-cross validation zu evaluieren. An dieser Stelle wird auf das Trainieren mehrerer Modelle desselben Algorithmus verzichtet.
+
+Um sicherzustellen, dass beim Trainieren unterschiedlicher Modelle (und mehrmaligem Ausführen der k-fold cross-validation) immer die gleichen Extrakte im Rahmen des Resamplings aus dem Trainingsdatenset gezogen werden, starte ich mit der Funktion "set.seed()".
+Andernfalls wäre die Auswahl rein zufällig und ließe sich nicht reproduzieren.
+
+```{r}
+set.seed(123) # Ermöglicht das wiederholte Ausführen der k-fold cross-validation mit gleichem Ergebnis.
+
+cv_folds <- vfold_cv(WDI_train, v = 5) # Ausführen der 5-fold cross-validation und Speichern als neues Objekt.
+```
+
+## Lineare Regression
+
+### Modellbestimmung
+
+An dieser Stelle bestimmten wir das zu verwendende Modell und speichern es als neues Objekt in unserer R-Umgebung.
+
+```{r}
+lm_mod <- 
+  linear_reg() %>%
+  set_engine("lm") %>%
+  set_mode("regression")
+```
+
+### Modell trainieren
+
+Ich trainiere das Modell der einfachen linearen Regression auf die Variable "Internet_User_pp" als Variable mit dem stärksten linearen Zusammenhang zur Response-Variable "GDP_per_capita"
+
+Da ich an dieser Stelle auf das Trainieren und Evaluieren mehrerer linearer Modelle (mit veränderter Prediktorzusammensetzung) verzichte, wende ich die k-fold-cross validation direkt an dieser Stelle an.
+
+In der Praxis könnte man zwei oder drei lineare Modelle trainieren, die zunächst alle Variablen mit starken Zusammenhang zur Response-Variable beinhalten und über das summary() des Modells, unter Berücksichtigung von F-Statistik, R² und Adjusted R² die geeignetste Predikatorenzusammenstellung für ein finales lineares Modell auswählen.
+
+```{r}
+lm_fit <- 
+  lm_mod %>%
+  fit_resamples(GDP_per_capita ~ Internet_User_pp,
+                resamples = cv_folds)
+```
+
+### Modell evaluieren
+
+Fassen wir unser erstes Modell, die lineare Regression, einmal zusammen und schauen uns die wesentlichen Parameter des Modells an.
+
+```{r}
+collect_metrics(lm_fit, summarize = FALSE) # Darstellung des RMSE und des R² für jeden der 5 Durchläufe
+```
+
+Schauen wir uns aggregriert auch den Durchschnitt (arithmetisches Mittel) des RMSE und des R² über alle 5 Durchläufe an.
+
+```{r}
+lm_metrics <- collect_metrics(lm_fit, summarize = TRUE)
+
+lm_metrics
+```
+
+Das hier evaluierte Modell der linearen Regression genügt den Ansprüchen einer verlässlichen Vorhersage noch nicht besonders gut. 
+
+Der RMSE beträgt (über alle 5 Durchläufe) 13,219 - der durch unser Modell vorhergesagte Wert für das GDP_per_capita (BIP pro Kopf) weicht also im Durchschnitt um $13,219 von unseren tatsächlichen Beobachtungswerten ab. Unter Berücksichtigung unserer Erkenntnisse aus der Histogrammdarstellung des GDP_per_capita und dessen Verteilung, ist das ein sehr hoher Wert, wenn man bedenkt, dass es einen großen Teil an Datenpunkten (Länder) gab, die sich im BIP pro Kopf unter $25,000 befunden haben.
+
+Entsprechend niedrig ist auch unser R² für das Modell der linearen Regression. Mit gerade einmal 0,507 bedeutet der R² in diesem Fall, dass der Predictor im Modell der linearen Regression gerade einmal in der Lage ist ca. 50,7% der Varianz in der Response-Variable unserer Trainingsdaten zu erklären.
+
+In der Praxis würde man an dieser Stelle (nach eventueller Visualisierung, die auch hier noch folgt) noch einmal auf die Prediktorvariablen schauen und ggf. die Zusammensetzung der Prediktoren verändern (z.B. Hinzufügen weiterer Prediktoren, die eine relativ starke Korrelation zur Response-Variable haben), um ggf. ein besseres Modellergebnis zu erzielen.
+An dieser Stelle wird auf ein solches Update (Trainieren eines weiteren Modells mit den Erkenntnissen dieses Modells) verzichtet.
+
+### Modell visualisieren
+
+Schauen wir uns das Modell grafisch an.
+
+
+```{r}
+ggplot(WDI_train, aes(x = Internet_User_pp, y = GDP_per_capita)) + 
+  geom_point(color = "#A2CD5A") + 
+  geom_smooth(color = "black", method ="lm", se = TRUE) + 
+  theme_light() +
+  xlab("%-Anteil Bevölkerung mit Internet") + 
+  ylab("BIP pro Kopf") +
+  ggtitle("Einfache lineare Regression")
+```
+ 
+In dem Punktediagramm, was an dieser Stelle geplottet wurde, wird das Problem der einfachen linearen Regression für unsere Daten relativ schnell klar.
+Die Punktekurve folgt einem exponentiellen Verlauf. Denn, je höher der relative Anteil der Internetnutzer an der Gesamtbevölkerung eines Landes, desto stärker steigt tendenziell das BIP pro Kopf. Diesen exponentiellen Anstieg bildet die einfache lineare Regression verständlicherweise nicht ab, was folglich zu einer relativ schwachen Modellperformance führt.
+
+Ebenso ist ersichtlich, dass in der hier dargestellten Regressionsgeraden der Intercept-Wert (Schnittpunkt mit der y-Achse, wo x= 0) negativ ist und bei ca. -10,000 liegt, was in der kausalen Interpretation nicht besonders logisch ist.
+
+```{r}
+summary(lm(GDP_per_capita ~ Internet_User_pp, data = WDI_train)) # Ausgabe der Koeffizienten/Parameter (Intercept und Steigung) für das lm mit unserer Prediktorvariable
+```
+
+Der Intercept (y wenn x=0) liegt, wie grafisch auch abzuschätzen, bei -10,493.8.
+
+Die Steigung der Regressionsgeraden beträgt 475.6. Das bedeutet, dass eine Erhöhung von x um eine Einheit (1%) eine durchschnittliche Erhöhung des BIP pro Kopf von $475.6 bewirkt.
+
+## Regression mit Natural Spline
+
+Als zweites Modell wende ich eine Natural Spline Regression an.
+
+Durch Testen unterschiedlicher Freiheitsgerade, im Rahmen des Hyperparameter-Tunings, der im weiteren Verlauf noch bestimmt werden muss, lässt sich die Komplexität der linearen Regression mit Natural Spline erhöhen und u.U. bessere Vorhersageergebnisse als mit einer einfachen linearen Regression erzielen.
+
+### Modellbestimmung
+
+An dieser Stelle bestimmten wir das zu verwendende Modell und speichern es als neues Objekt in unserer R-Umgebung.
+
+```{r}
+lm_mod_sp <- 
+  linear_reg() %>%
+  set_engine("lm")
+```
+
+### Tuning des Hyperparameters
+
+Für den weiteren Verlauf des Trainierens des Modells auf das Trainingsdatenset nutze ich die "recipe"-Funktion.
+Dies vereinfacht das Tunen des Hyperparameters im weiteren Verlauf und das darauffolgende Trainieren des Modells.
+Das Recipe wird dafür als ein separates Objekt "spline_rec" gespeichert. Hierauf kann im Rahmen des Hyperparatertunings und im Rahmen des Modelltrainings vereinfacht zurückgegriffen werden und das erneute Coden der im Objekt enthaltenen Codezeilen entfällt.
+
+Insbesondere auch die spätere Anwendung des Recipes auf die Testdaten wird damit vereinfacht und lässt sich exakt analog zur Durchführung in den Trainingsdaten auch auf die Testdaten anwenden.
+
+Im Rahmen des Recipes definiere ich den zu optimierenden Hyperparameter.
+
+```{r}
+spline_rec <-
+  recipe(GDP_per_capita ~ Internet_User_pp, 
+                data = WDI_train) %>%
+  step_ns(Internet_User_pp, 
+          deg_free = tune("Internet_User_pp")) # fügt dem Datensatz neue Features (Spalten) der Variable "Internet_User_pp" hinzu. Abhängig von den gewählten Freiheitsgraden wird die entsprechende Anzahl an Features (Spalten) hinzugefügt. Welche Anzahl an Freiheitsgraden am geeignetsten für den jeweiligen Fall ist, werden wir noch im Rahmen des Trainings feststellen, in dem wir verschiedene Hyperparameterkombinationen testen.
+```
+
+```{r}
+parameters(spline_rec) # Anzeige des im Rahmen des Tunings ausgewählten Hyperparameters
+```
+
+```{r}
+spline_param <-
+  spline_rec %>%
+    parameters() %>%
+    update(Internet_User_pp = spline_degree())
+```
+
+```{r}
+spline_degree()
+```
+
+Um verschiedene Ausprägungen des Hyperparameters zu testen, benutze ich die Grid-Search-Methode für das Hyperparametertuning.
+
+```{r}
+spline_grid <- 
+  grid_max_entropy(spline_param, size = 10) # Objekt zur Ausführung der Grid-Search mit bis zu 10 Freiheitsgeraden.
+```
+
+### Modell trainieren
+
+Im nächsten SChritt trainieren wir das Modell und integrieren auch das Hyperparametertuning in die Code-Pipeline.
+
+```{r}
+spline_fit <- 
+  tune_grid(lm_mod_sp, # Auswahl des spezifizierten Natural Spline Regression Modells
+            spline_rec, # Aufruf des Recipes im Rahmen des Trainings
+            resamples = cv_folds, # Ausführen des Resampling mit der 5-fold-cross-validation
+            grid = spline_grid) # Grid-Search für das Hyperparametertuning mit bis zu 10 Freiheitsgraden
+```
+
+### Modell evaluieren
+
+Schauen wir uns für die Evaluation die Metriken vom Objekt "spline_fit" an.
+```{r}
+spline_fit$.metrics # Ausgabe der Metriken (RMSE und R2) für alle Parameterkombinationen (df = n) und alle Stichproben aus der k-fold cross-validation
+```
+
+Im nächsten Schritt schaue ich mir den durchschnittlichen RMSE und R² aller Stichproben (aus der k-fold cross validation) für jede Parameterkombination (Freiheitsgrade) an.
+
+```{r}
+estimates <- collect_metrics(spline_fit)
+
+estimates
+```
+
+Mich interessiert, bei welcher Anzahl der Freiheitsgrade der RMSE durchschnittlich (über alle Stichproben aus der k-fold cross-validation) am geringsten ist.
+Dafür schaue ich mir nun die besten Ergebnisse des trainierten Modells in Bezug auf den RMSE (Root Mean Squared Error) und den R2 an.
+
+```{r}
+show_best(spline_fit, metric = "rmse")
+
+show_best(spline_fit, metric = "rsq")
+``` 
+
+
+df=1 entspricht der einfachsten Ausprägung einer linearen Regression.
+Das beste Ergebnis (geringster RMSE und höchster R2) wird in diesem Fall mit df (degrees of freedom) = 4 erzielt.
+
+Der Zusammenhang zwischen der "Anzahl der Freiheitsgrade" für den im Recipe definierten Hyperparameter und dem "RMSE" lässt sich auch grafisch in einem Plot darstellen.
+
+```{r}
+autoplot(spline_fit, metric = "rmse") +
+  theme_light()
+```
+
+In diesem Plot wird das Ergebnis der optimalen Anzahl an Freiheitsgraden (gemessen mit dem RMSE) für die Natural Spline Regression noch einmal bestätigt (df = 4).
+
+Gleiches können wir auch für den R² als wichtigen Modellparameter tun:
+
+```{r}
+autoplot(spline_fit, metric = "rsq")+
+  theme_light()
+```
+
+Auch beim R2 wird anhand des Plots noch einmal deutlich, dass df = 4 die optimale Höhe der Freiheitsgerade zur Erzielung des besten Modellergebnisses auf den Trainingsdaten erreicht wird.
+
+Diese Vorgehensweise ließe sich jetzt in der Praxis durch Hinzunahme einer weiteren oder mehrerer stark korrelierenden Variablen (z.B. Server und/oder Acc_2_Electricity) wiederholen, um den Unterschied in der Performance (RMSE, R² und ggf. F-Statistik) zu vergleichen und sich am Ende für ein Set-Up des Natural Spline-Modells zu entscheiden.
+
+Final würde man sich für die Predikatorenzusammensetzung und den jeweiligen Hyperparameter entscheiden, die zusammen die beste Performance erreicht haben.
+
+### Trainieren des finalen Modells
+
+DF=4 ist der optimale Hyperparameterwert für die Modellkomplexität (Freiheitsgrade). An dieser Stelle trainieren wir das Modell der Natural Spline explizit mit diesem Hyperparameterwert inkl. Resampling.
+
+```{r}
+spline_fit2 <- 
+  lm_mod_sp %>% 
+  fit_resamples(GDP_per_capita ~ splines::ns(Internet_User_pp, 4), resamples = cv_folds)
+```
+
+Ich speichere die Performanceparameter (RMSE und R2) für die Natural Spline mit df = 4 in einem separaten Objekt ab.
+
+```{r}
+ns_metrics <- collect_metrics(spline_fit2)
+
+```
+
+
+### Modell visualisieren
+
+Die Visualisierung der Natural Spline Regression wird wie folgt realisiert:
+
+```{r}
+ggplot(WDI_train, aes(Internet_User_pp, GDP_per_capita)) +
+  geom_point(color = "#A2CD5A") +
+  geom_smooth(color = "black", method ="lm",
+              formula = y ~ splines::bs(x, 4), se = TRUE) + # Auswahl des Spline-Modells mit 4 Freiheitsgraden zur Visualisierung
+  theme_light() +
+  xlab("%-Anteil Bevölkerung mit Internet") + 
+  ylab("BIP pro Kopf") + 
+  ggtitle("Natural Spline Regression")
+ 
+```
+
+Vergleicht man nun die Plots der linearen Regression mit und ohne Natural Splines - also mit oder ohne etwas erhöhter Komplexität (df = 4) - stellt man fest, dass sich die Regressionskurve nicht mehr rein linear in die Datenpunkte legt. Es wurde also eine stückweise polynomiale Anpassung vorgenommen, in dem die Freiheitsgrade erhöht wurden (Standard in linearer Regression ist df = 1). In unserem Fall wurde die optimale Modellkomplexität auf df = 4 gesetzt, was einer Funktion 3. Grades entspricht.
+
+Die Regressionskurve passt sich den Datenpunkten sichtbar besser an. Insbesondere wird der exponentielle Anstieg des BIP pro Kopf bei sehr hohem Anteil der ans Internet angebundenen Bevölkerung (>75%) besser abgebildet, als im Modell der einfachen linearen Regression ohne Natural Splines.
+
+Die bessere Anpassung konnten wir aber bereits im Rahmen der Modellevaluation (anhand RMSE und R²) beobachten. Die lineare Regression mit Natural Splines hatte einen niedrigeren RMSE und einen höheren R³, was für eine verbesserte Anpassungsfähigkeit des Modells spricht. Damit ist die lineare Regression mit Natural Splines in der Lage einen größeren Anteil der Schwankungen in der Response-Variable mit Hilfe des Predictors (hier: Internet_User_pp) zu erklären, als es die einfache lineare Regression war.
+
+Dass eine weitere Erhöhung der Komplexität (df > 4) mit unserem ausgewählten Prediktor zu keinem besseren Ergebnis (RMSE und R²) des Modells führt, haben wir im Rahmen der Modellevaluation (s. Plots) gesehen.
+
+## Regression mit XG Boost
+
+### Modellbestimmung
+
+An dieser Stelle bestimmten wir das zu verwendende Modell und speichern es als neues Objekt in unserer R-Umgebung.
+
+```{r}
+xgb_mod <- 
+  boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+```
+
+### Modell trainieren
+
+Das Modell trainiere ich in diesem Fall ohne bestimmte Komplexität (max.depth und nodes = n).
+Die optimale Komplexität könnte ggf. im Rahmen des Hyperparametertunings getestet und ermittelt werden. Dies wird in diesem Fall nicht näher betrachtet.
+
+```{r}
+xgb_fit1 <- 
+  xgb_mod %>% 
+  fit_resamples(GDP_per_capita ~ Internet_User_pp, resamples = cv_folds)  # Trainieren und Evaluieren des Modells xgb_mod auf die 5 Folds
+```
+
+*Hinweis:* Der XGBoost-Algorithmus wird an dieser Stelle ebenfalls auch nur auf die Variable "Internet_User_pp" trainiert. Grundsätzlich eignet sich der XGBoost-Algorithmus dafür, alle verfügbaren Variablen mit in das Modell aufzunehmen und eine Art natürliche Variablenselektion durch den XGBoost vornehmen zu lassen.
+Um die Vergleichbarkeit zu der einfachen linearen Regression und der Natural Spline Regression zu erhöhen, wird dieser Algorithmus an dieser Stelle ebenfalls nur auf die Variable "Internet_User_pp" trainiert.
+
+### Modellevaluation
+
+Im nächsten Schritt schaue ich mir RMSE und R² des XGBoost-Regressionsmodells an.
+
+```{r}
+xgb_fit1 %>% 
+  collect_metrics(summarize = FALSE)
+
+xgb_metrics <- xgb_fit1 %>% 
+  collect_metrics()
+xgb_metrics
+```
+
+Der RMSE liegt bei dem XG-Boost-Modell (nach dem Resampling) bei 12665.
+Der durch das Modell vorhergesagte Wert des BIP pro Kopf weicht also durchschnittlich um $12665 vom tatsächlichen BIP pro Kopf eines Landes ab.
+
+Der R² des XGBoost liegt bei 0,57. 
+Ein R² von 0,57 sagt aus, dass die gewählten Prediktoren (hier: Internet_User_pp) in der Lage sind 57% der Streuung in y = GPD_per_capita zu erklären.
+
+## Lasso Regression
+
+### Datenvorbereitung
+Bevor wir das Modell bestimmen, trainieren, das Hyperparametertuning durchführen und das Modell dann schlussendlich evaluieren, müssen wir noch eine vorbereitende Maßnahme zur Anwendung der Lasso Regression treffen.
+
+*Hinweis:* Als Prediktorvariablen werde ich bei diesem Modell nicht nur die Variable "Internet_User_pp" in das Modell hereingeben. Die Lasso Regression eignet sich, bedingt durch die Straffunktion L1, als Algorithmus, der selbstständig eine Variablenselektion vornimmt. Die Straffunktion L1 führt dazu, dass die Parameter der für das Modell nicht relevanten Variablen = 0 gesetzt werden bzw. sich = 0 annähern. Die optimale Höhe der Straffunktion und dort beinhalteten Parameter werden wir im Rahmen des Hyperparametertunings identifzieren.
+
+Wir erstellen nun ein Recipe mit allen numerischen Variablen des Datensatzes, außer unserer Outcome-Variable, und starten mit der Normalisierung (z-Standardisierung).
+
+**Hinweis zur z-Standardisierung:** Von jedem Residuum wird der Mittelwert abgezogen und anschließend durch die Standardabweichung (s) geteilt.
+
+```{r}
+# Erstellung des Recipes -> notwendig, um die numerischen Prediktorvariablen für die Modellierung zu normalisieren (z-Standardisierung)
+
+
+lasso_rec <- 
+  recipe(GDP_per_capita ~ ., data = WDI_train) %>%
+  update_role(country, new_role = "ID") %>% 
+  step_normalize(all_numeric(), -all_outcomes())
+
+summary(lasso_rec) # Anzeige aller Variablen inkl. Skalenniveau und Rolle innerhalb des Recipe
+```
+
+Das Recipe und die Modellspezifikation binden wir, für das bevorstehende Training des Modells, in einen Workflow ein.
+
+```{r}
+# Einbindung des Recipes in einen Workflow für ein vereinfachtes Training des Modells
+
+lasso_wf <- 
+  workflow() %>% 
+  add_recipe(lasso_rec)
+```
+
+### Modellbestimmung
+
+Bestimmten wir zunächst das Modell für die Lasso Regression - zunächst ohne Hyperparametertuning.
+
+```{r}
+# Bestimmung des Modells für die Lasso Regression (zunächst ohne Tuning)
+lasso_mod <- 
+  linear_reg(penalty = 0.1, mixture = 1) %>% # Durch Mixture = 1 setzen wir eine reine Lasso Regression um (mit L1 Straffunktion)
+  set_engine("glmnet")
+```
+
+### Modell trainieren
+
+Im nächsten Schritt trainieren wir den eben spezifizierten Algorithmus auf unsere Trainingsdaten und schauen uns die Koeffizienten an.
+
+```{r}
+lasso_fit <-
+  lasso_wf %>% # Anwendung des Recipes im Workflow
+  add_model(lasso_mod) %>% 
+  fit(data = WDI_train)
+
+lasso_fit %>% 
+  pull_workflow_fit() %>% 
+  tidy() # Anzeige der Koeffizienten des trainierten Modells
+
+``` 
+
+### Tuning des Hyperparameters
+Bevor wir uns die konkrete Performance des trainierten Modells auf den Trainingsdaten anschauen, machen wir noch das Hyperparametertuning, um den perfekten Regularisierungsparameter (penalty) zu identifizieren.
+
+Dies erfolgt im Rahmen der Lasso Regression ebenfalls mit der Grid-Search Methode, wie schon bei der Natural Spline.
+
+
+```{r}
+# Erstellung des Modells mit Definition des Parameters (hier: penalty), den es zu optimieren gilt
+lasso_tune_mod <- 
+  linear_reg(penalty = tune(), mixture = 1) %>% 
+  set_engine("glmnet")
+
+# Erstellung der Grid mit selbst festgelegtem Wertebereich
+lambda_grid <- 
+  tibble(penalty = c(seq(0, 1000, by = 1))) 
+```
+
+### Modell trainieren (mit Hyperparametertuning)
+
+In diesem Teil trainieren wir nun das Modell inkl. Hyperparametertuning, welches wir eben vorbereit haben, und Resampling.
+
+```{r}
+# Trainieren des Modells (mit Tuningparameter "penalty") inkl. Grid für das Hyperparametertuning. 
+
+library(doParallel)
+
+doParallel::registerDoParallel()
+
+set.seed(256)
+
+lasso_fit2 <- 
+  tune_grid(
+    lasso_wf %>% 
+      add_model(lasso_tune_mod),
+      resamples = cv_folds, # Resampling mit k-fold cross-validation
+      grid = lambda_grid)
+```
+
+### Modell evaluieren
+
+Schauen wir uns die Performance des mit Hyperparametertuning trainierten Modells an.
+
+Zunächst die Performance für jedes Fold und alle denkbaren Hyperparameterkombinationen aus unserem definierten Wertebereich.
+
+```{r}
+lasso_fit2 %>% 
+  collect_metrics(summarize=FALSE) # Ausgabe der Metriken "RMSE" und "R2" für alle Hyperparameterkombinationen und Durchläufe (aus der k-fold cross validation)
+```
+
+Anschließend als Durchschnitt über alle Folds für jede denkbare Hyperparameterkombination aus unserem definierten Wertebereich für das Tuning:
+
+```{r}
+lasso_fit2 %>% 
+  collect_metrics() # Ausgabe der Metriken "RMSE" und "R2" für alle Hyperparameterkombinationen als Durchschnitt aller Durchläufe
+```
+
+Uns interessieren in erster Linie jene Hyperparameterwerte, bei denen der RMSE und der R2 jeweils am Besten sind:
+
+```{r}
+lasso_fit2 %>% 
+  show_best(metric = "rmse") # Anzeige der besten Werte des RMSE
+
+lasso_fit2 %>% 
+  show_best(metric = "rsq") # Anzeige der besten Werte des R2
+
+lasso_fit2 %>% select_best("rmse")
+lasso_fit2 %>% select_best("rsq")
+```
+
+Die Performance lässt sich nicht nur tabellarisch mit collect_metrics() anzeigen, sondern auch plotten.
+Es lässt sich für den RMSE und den R2 (analog, wie bereits bei der Natural Spline) ein Plot erstellen, der die Performance (abhängig vom Hyperparameter) visualisiert.
+
+```{r}
+autoplot(lasso_fit2, metric ="rsq") + 
+  theme_light()
+```
+
+```{r}
+autoplot(lasso_fit2, metric ="rmse") + 
+  theme_light()
+```
+
+Im Ergebnis, nach Anwendung der Lasso Regression auf die Trainingsdaten, können wir festhalten, dass der beste RMSE bei einem Penalty-Wert von 808 und der beste R2 bei einem Penalty-Wert von 780 erzielt wird.
+
+An diesen Stellen beträgt der RMSE auf den Trainingsdaten 12,411. Der R2 auf den Trainingsdaten beträgt 0,594. 
+
+Damit ist die Lasso Regression zwar etwas besser als die einfache lineare Regression, unterliegt jedoch sowohl der Natural Spline Regression als auch dem XGBoost-Algorithmus. Außer muss man an dieser Stelle festhalten, dass es, trotz sehr großem Wertebereich für den penalty-Wert im Tuning, nicht den einen optimalen Hyperparameterwert bei dem sowohl RMSE und R2 optimal sind, gibt. 
+
+Die Lasso Regression scheint auf meinen Datensatz, trotz des bereits im Tuning verwendeten sehr großen Wertebereichs für den Hyperparameter, nicht gut zu funktionieren. Außerdem scheint die Festlegung eines derart großen Wertebereichs für das Hyperparametertuning nicht besonders sinnvoll.
+
+```{r}
+# Speichern der Performanceparameter RMSE und R2 bei optimalem Hyperparameterwert in einem separaten Objekt.
+
+lasso_metrics1 <- 
+  lasso_fit2 %>% 
+  show_best(metric = "rsq") %>% 
+  dplyr::filter(penalty == 780)
+
+lasso_metrics2 <- 
+  lasso_fit2 %>% 
+  show_best(metric = "rmse") %>% 
+  dplyr::filter(penalty == 808)
+```
+
+
+# Auswahl des besten Modells
+
+Die Auswahl des Modells mit den besten Parametern bzgl. Performance und Güte (RMSE und R²) fält in diesem Fall nicht schwer.
+
+Schauen wir uns die Ergebnisse (RMSE und R2) der einzelnen Modelle noch einmal in einer Übersicht in Form einer Tabelle an. Hierfür haben wir jeweils die Ergebnisse der einzelnen Modelle im Anschluss an die Evaluation in Objekte gespeichert, auf die wir nun zur Erstellung der übersichtlichen Tabelle zurückgreifen können.
+
+```{r}
+mod_res <- 
+  tibble(Model ="Linear Regression", RMSE = lm_metrics$mean[1], R2 = lm_metrics$mean[2]) %>% 
+  add_row(Model = "Natural Spline Regression", RMSE = ns_metrics$mean[1], R2 = ns_metrics$mean[2]) %>% 
+  add_row(Model = "XGBoost Regression", RMSE = xgb_metrics$mean[1], R2 = xgb_metrics$mean[2]) %>% 
+  add_row(Model = "Lasso Regression", RMSE = lasso_metrics2$mean, R2 = lasso_metrics1$mean)
+
+mod_res
+```
+
+Die Natural Spline Regresssion weist, nach Anwendung und Evaluation auf den Trainingsdaten (mit Resampling), den geringsten RMSE (durchschnittliche Abweichung des vorhergesagten Wertes von den echten Daten) und den höchsten R² (Erklärung der Streuung in y durch x) aus.
+
+Der RMSE der Natural Spline Regression lag bei 10,530.08 und der R2 lag bei sehr guten 0,67.
+
+Entsprechend werden wir das trainierte Modell mit Natural Spline im nächsten Schritt  verwenden, um dessen Performance auf den Testdaten (neue Daten) zu evaluieren.
+
+## Trainieren des finalen Modells
+
+Nun trainieren wir das finale Modell (Natural Spline Regression) mit der Funktion last_fit() und schauen uns im weiteren Verlauf dessen Performance auf neuen Daten an.
+
+```{r}
+# Trainieren mit last_fit() ermöglicht das Trainieren auf den Trainingsdaten und Evaluieren auf den Testdaten in einem Schritt
+
+final_spline <- 
+  lm_mod_sp %>% 
+  last_fit(GDP_per_capita ~ splines::ns(Internet_User_pp, 4), split = WDI_split)
+
+final_spline
+```
+
+## Evaluation / Fazit
+
+Schauen wir uns zunächst die Modellkoeffizierenten der Natural Spline Regression an:
+
+```{r}
+final_spline$.workflow[[1]] 
+```
+Der Intercept (Schnittpunkt mit der y-Achse) unseres Spline-Modells liegt beim finalen Modell bei 147. Außerdem sehen wir, dass durch Erhöhung der Freiheitsgerade im Rahmen des vorangegangenen Hyperparametertunings beim Natural Spline-Algorithmus nun vier polinomiale Grade der Prediktor-Variable "Internet_User_pp" (df=4) enthalten sind.
+
+Wie gut performt das Natural Spline-Modell nun wirklich? Hierfür interessiert uns die Performance auf dem Testteil des Objekts "WDI_split", mit dem wir gerade im vorangegangenen Chunk die Funktion last_fit() ausgeführt haben.
+
+```{r}
+final_spline %>% 
+  collect_predictions() # Ausgabe der VOrhersageergebnisse auf den Testdaten
+```
+
+Zur Messung der Performance berechne ich den RMSE und den R² des Modells auf den Testdaten.
+
+```{r}
+final_spline%>% 
+  collect_metrics() # Ausgabe der Performancemetriken RMSE und R2
+```
+
+Die Performance des Natural Spline Modells auf neuen Daten sieht an dieser Stelle noch besser aus, als das auf den Trainingsdaten (mit Resampling) der Fall war. 
+
+Der RMSE liegt bei 6699 und der R² bei 0,843.
+Damit können wir also 84,3% der Streuung im BIP pro Kopf mit der erklärenden Variable "Internet_User_pp" erklären.
+Die durchschnittliche Abweichung des vorhergesagten Wertes von dem realen Wert des BIP pro Kopf beträgt dabei ca. $6,699.
+
+Dieses Vorhersageergebnis auf den Testdaten ist, unter Berücksichtigung der vorherigen Evaluationsergebnisse der verschiedenen Modelle auf den Trainingsdaten (mit Resampling), sehr gut. 
+
+Da wir mit dem hier final trainierten und evaluierten Modell in der Lage sind 84% der Streuung in unserer Outcome-Variable mit unserem Modell vorherzusagen, können wir im Hinblick auf die einleitend festgehaltene Zielsetzung der Projektarbeit festhalten, dass wir grundsätzlich mit einer recht hohen Genauigkeit in der Lage sind, das BIP pro Kopf, abhängig vom relativen Anteil der an das Internet angebundenen Bevölkerung eines Landes, vorherzusagen.
+
+Zum Abschluss dieser Arbeit möchte ich das final ausgewählte und auf den Testdaten evaluierte Modell der Natural Spline Regression noch einmal visualisieren.
+
+```{r}
+# Plotten der Natural Spline-Regression mit df=4 auf den Testdaten
+
+ggplot(WDI_test, aes(Internet_User_pp, GDP_per_capita)) +
+  geom_point(color = "#A2CD5A") +
+  geom_smooth(color = "black", method ="lm",
+              formula = y ~ splines::bs(x, 4), se = TRUE) + # Auswahl des Spline-Modells mit 4 Freiheitsgraden zur Visualisierung
+  theme_light() + 
+  ggtitle("Finale Natural Spline Regression") + 
+  xlab("%-Anteil Bevölkerung mit Internet") + 
+  ylab("BIP pro Kopf")
+```
+
+Nicht nur aus der Interpretation der Metriken (RMSE und R2), sondern auch in dem Plot des Modells, sehen wir, dass die Performance der Natural Spline auf den Testdaten sehr gut ist.
+
+Wie wir eben, anhand der Modellkoeffizienten, gesehen haben, befindet sich der Intercept (Schnittpunkt mit y-Achse) leicht über 0.
+Darüber hinaus legt sich die Kurve der Natural Spine Regression sehr gut in die Datenwolke der Testdaten und zeigt, durch die Erhöhung des polynomialen Grades unserer Prediktorvariable, eine sehr gute Anpassungsfähigkeit.
+
+
+  
+  
+  
+  
+
+
+
+&copy; Sebastian Wölk

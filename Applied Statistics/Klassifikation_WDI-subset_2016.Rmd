@@ -1,0 +1,732 @@
+---
+title: "Projektarbeit: Klassifikationsmodelle"
+subtitle: "Vorhersage des Status eines Landes"
+author: "Sebastian Wölk"
+date: "03.12.2020"
+output:
+ html_document:
+   code_folding: hide 
+   code_download: yes
+   fig_height: 4
+   fig_width: 4
+   number_sections: yes
+   toc: yes
+   toc_float:
+     collapsed: no
+     smooth_scroll: true 
+   theme: paper
+   df_print: paged
+---
+
+```{css, echo=FALSE}
+
+/* css code to change the look of the HTML-output */
+  
+h1 {
+  color: #A2CD5A;
+  font-size: 200%;
+  }
+h2 {
+  color: #666666;
+  font-size: 150%;
+  }
+h3 {
+  font-size: 120%;
+  font-weight: bold;
+  }
+h4 {
+  color: rgb(139, 142, 150);
+  font-size: 100%;
+  font-weight: bold;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+       z-index: 2;
+       color: #fff;
+       background-color: #A2CD5A;
+       border-color: #337ab7;
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+# Laden benötigter Pakete
+
+Im ersten Schritt laden wir notwendige Pakete mit Funktionen, die im Laufe des Projekts benötigt werden.
+
+```{r message=FALSE, warning=FALSE}
+library(tidymodels) # Wichtige Pakete im Umfeld der Modellierung
+library(skimr) # Paket für deskriptive Statistiken
+library(xgboost) # Notwendiges Paket für den XG Boost
+library(readr) # Paket ermöglicht das Lesen von unterschiedlichen Datenformaten (z.B. hier "csv")
+library(tidyverse)  # Sammlung an sinnvollen und nützlichen Paketen im Data Science-Umfeld
+library(ranger) # Notwendiges Paket für Random Forest
+library(vip) # Paket zur Visualisierung vom Variable Importance Plots
+```
+
+# Einleitung 
+
+Ich verwende in dieser Arbeit den Datensatz "world_indicator_2016_subset.csv".
+
+Hierbei handelt es sich um einen Auszug eines Datensatzes der Weltbank. Er enthält Entwicklungsdaten unterschiedlicher Länder mit Angaben, wie z.B. der Bevölkerungszahl, der Geburten- und Sterberate, Angaben über den mit elektrischem Strom versorgten Bevölkerungsanteil, dem Anteil der ländlich und städtisch lebenden Bevölkerung, dem BIP (Bruttoinlandsprodukt) und viele mehr.
+
+# Business Understanding
+
+In dieser Arbeit soll anhand der im eben kurz vorgestellten Datensatz enthaltenen Entwicklungsdaten der jeweiligen Länder mit verschiedenen Modellen vorhergesagt werden, ob es sich um ein armes oder ein reiches Land handelt. Hierfür stehen eine Vielzahl an Variablen (Entwicklungsdaten unterschiedlicher Länder) zur Verfügung.
+
+Hierfür werden im späteren Verlauf dieses Notebooks mehrere Klassifikationsmodelle trainiert und evaluiert, um mit ihnen Vorhersagen zum Status eines Landes (arm oder  reich) machen zu können.
+
+In der Evaluationsphase der Modelle wird die Performance und Güte der Klassifikationsmodelle  mit bekannten Parametern, z.B. der Accuracy, dem Recall und der Precision, gemessen und verglichen. 
+
+Ziel ist es, aus den oben genannten Klassifikationsmodellen, jenes zu identifizieren, welches, anhand der vorliegenden Daten, am besten eine solche Vorhersage vornehmen kann.
+
+In diesem Zusammenhang stellt sich, je nach Use-Case und Analyseziel, die Frage, ob ein hoher Recall oder eine hohe Precision der wichtigere Performanceparameter eines zu evaluierenden Modells ist.
+
+*Recall:* Auch bezeichnet als "true-positive-rate" gibt der Recall Auskunft über die Anzahl true positives (als positiv vorhergesagte und tatsächlich positive Fälle) im Verhältnis zu den true positives und den false negatives (als negativ vorhergesagte Werte, die tatsächlich positiv waren).
+
+*Prediction:* Auch bezeichnet als "positive predictive value" gibt die Precision Auskunft über die Anzahl true positives im Verhältnis zu den true positives und den false positives (als positiv vorhergesagte Werte, die  tatsächlich negativ waren).
+
+Ein hoher Recall wird also durch eine sehr geringe false negative-Anzahl erreicht, wohingegen die false positives durchaus vermehrt auftreten können.  
+Eine hohe Precision hingegen hat eine niedrige Anzahl false positives als Ursache, kann jedoch eine erhöhte Anzahl false negatives zur Folge haben.
+
+In unserem Fall entscheiden wir uns für eine möglichst hohe Precision und legen damit fest, dass es in unserem Fall wichtiger für die Modelle ist, die false positive-Anzahl zu reduzieren - also ein Land nicht fälschlicherweise als reich einzustufen, obwohl es eigentlich arm ist. Dafür nehmen wir eine erhöhte Anzahl an möglicherweise tatsächlich reichen Ländern in Kauf, die von unserem Algorithmus als arm eingestuft werden.
+
+# Data Understanding
+
+## Datenimport
+
+Importieren wir zunächst den Datensatz und verschaffen uns einen groben Überblick.
+
+```{r}
+WDI <- read_csv("https://raw.githubusercontent.com/kirenz/datasets/master/worldbank_indicator_2016_subset.csv")
+
+
+glimpse(WDI)
+```
+
+## Datenvorbereitung
+
+Um ein Land als "reich" oder "arm" zu klassifizieren, werde ich eine neue Variable in den bestehenden Datensatz einfügen - das BIP pro Kopf.
+Das BIP pro Kopf soll in dieser Arbeit als Response-Variable (reich oder  arm) dienen und muss somit ebenfalls in eine kategoriale Variable umgewandelt werden. 
+
+Hierfür definiere ich, dass alle Länder, die ein BIP pro Kopf über dem arithmetischen Mittel aller Ausprägungen des BIP pro Kopf haben, als "reich" bezeichnet werden sollen.
+
+```{r}
+WDI <- # Alle kommenden Funktionen sollen ausgeführt und in dieses Objekt gespeichert werden.
+  WDI %>%
+  mutate(GDP_per_capita = GDP/Population, # Spalte "GDP_per_capita" errechnen und dem Datensatz anfügen
+         GDP_per_capita_kat = ifelse(GDP_per_capita <=13444.9,
+                                "poor",
+                                "rich"), # Erstellung der kategorialen Variable "GDP_per_capita_kat"
+        GDP_per_capita_kat = factor(GDP_per_capita_kat, ordered = FALSE, levels = c("rich", "poor")), # Umwandlung der neuen Variable in eine Faktorvariable mit Festlegung des Formats
+         across(where(is.character), as.factor)) # Umwandlung der restlichen Charaktervariablen in eine Faktorvariable
+
+glimpse(WDI) # Überprüfung der Struktur des WDI-Datensatzes nach der Datenvorbereitung
+
+summary(WDI$GDP_per_capita) # Ausgabe deskriptiver Statistiken zur Variable "GDP_per_capita".
+```
+
+## Trainings- und Testdatenset
+
+Aufteilen des Datensatzes in ein Trainings- und Testdatenset.
+
+```{r}
+set.seed(12) # Zufallsgenerator für die Ziehung von Test- und Trainingsdaten - zur Sicherstellung, dass bei jeder Ziehung die gleichen zufälligen Test- und Trainingssets generiert werden.
+
+WDI_split <- initial_split(WDI) # zufällige Splittung des Datensatzes inkl. Ablage in einem separaten Objekt in R.
+WDI_train <- training(WDI_split) # Extrahierung eines Trainingssets inkl. Speicherung eines eigenen Objekts.
+WDI_test <- testing(WDI_split) # Extrahierung eines Testsets inkl. Speicherung eines eigenen Objekts.
+```
+## Explorative Datenanalyse
+
+An dieser Stelle schauen wir uns noch einmal wesentliche Variablen des vorliegenden Datensatzes der Weltbank etwas genauer an.
+Besonders interessant ist das Plotten einzelner Variablen (als potentielle Prediktoren) gegenüber der Outcome-Variable "GDP_per_capita_kat" - unserer kategorialen Variable des BIP pro Kopf mit den Ausprägungen "arm" und "reich".
+
+Zunächst erstelle ich eine Kopie der Trainingsdaten, mit denen wir dann eine kurze Exploration durchführen.
+```{r}
+WDI_expl <- WDI_train # Kopie der Trainingsdaten in neuem Objekt speichern
+```
+
+Plotten wir als erstes die Variable "Internet_User_pp" gegen unsere kategoriale Outcome-Variable
+```{r}
+ggplot(WDI_expl, aes(x = GDP_per_capita_kat, y = Internet_User_pp, color = GDP_per_capita_kat)) + 
+  geom_boxplot() + 
+  labs(color = "Länderkategorie") +
+  xlab("BIP pro Kopf") + 
+  ylab("%-Anteil der Bevölkerung mit Internetzugang") +
+  ggtitle("Internetanbindung je Kategorie") +
+  theme_light()
+```
+
+An dieser Grafik erkennt man sehr gut, dass es scheinbar einen systematischen Unterschied zwischen ärmeren und reicheren Ländern hinsichtlich der Internetanbindung der Bevölkerung gibt.
+Im Median sind in den reichen Ländern mehr als 75% der Bevölkerung an das Internet angebunden.
+Bei den ärmeren Ländern hingegen sind es gerade einmal ca. 37,5% der Bevölkerung, die über einen Internetzugang verfügen.
+Gleichzeitig ist aber schon zu erkennen, dass es auch Überschneidungen gibt. Denn die oberen 25% der Beobachtungen bei ärmeren Ländern weisen einen ähnlichen %-Anteil ans Internet angebundener Bevölkerung auf, wie einige reichere Länder.
+
+Schauen wir uns im nächsten Schritt eine weitere Variable an und dessen Verteilung in Abhängigkeit von unserer kategorialen Outcome-Variable an.
+
+```{r}
+ggplot(WDI_expl, aes(x = GDP_per_capita_kat, y = Acc_2_Electricity, color = GDP_per_capita_kat)) +
+  geom_boxplot() + 
+  theme_light() +
+  labs(color = "Länderkategorie") +
+  xlab("BIP pro Kopf") + 
+  ylab("%-Anteil mit Strom versorgter Bevölkerung") +
+  ggtitle("Stromversorgung je Kategorie")
+```
+
+Der Median des %-Anteils der Bevölkerung mit elektrischer Stromversorgung der reichen Länder liegt bei 100%. Es gibt allerdings zwei Ausreißer - Länder in denen die Bevölkerung nicht vollständig mit elektrischem Strom versorgt wird.
+Bei den ärmeren Ländern gibt es hier eine deutlich größere Spannweite (Range). Der Median liegt hier auch bei über 90%, wir haben also definitiv eine Überlappung mit den reichen Ländern - bis hin zu 100%.
+Allerdings liegt der Minimalwert des %-Anteils der Bevölkerung, die Zugang zu Strom hat, bei den ärmeren Ländern bei unter 10%. Demnach ist hier schon ein Unterschied, je nach Status eines Landes, erkennbar - es scheint also auch hier auf jeden Fall einen Zusammenhang zur Outcome-Variable zu geben.
+
+Schauen wir uns noch eine dritte Variable, die Birth_rate, im Rahmen der Exploration an.
+
+```{r}
+ggplot(WDI_expl, aes(x = Birth_rate, fill = GDP_per_capita_kat)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values=c("#666666", "#A2CD5A")) +
+  theme_light() +
+  ggtitle("Geburtenrate je Kategorie") +
+  xlab("Geburtenrate pro 1000 Einwohner") + 
+  labs(fill = "Länderkategorie")
+```
+
+Auffällig in diesem Dichtediagramm, in dem wir die Geburtenrate in Abhängigkeit vom Status (reich oder arm) eines Landes geplottet haben, ist, dass die reicheren Länder im Datensatz eine tendenziell niedrigere Geburtenrate aufweisen.
+
+Es gibt Überschneidungen zwischen armen und reichen Ländern. Die allermeisten reichen Länder haben allerdings eine Geburtenrate von ca. 12 Geburten pro 1000 Einwohner. Die ärmeren Länder haben eine sehr breite Streuung in der Geburtenrate, die von 0 bis mehr als 45 pro 1000 Einwohner reicht. 
+
+Somit besteht auch hier, bei der Geburtenrate, ein Zusammenhang zu unserer kategorialen Outcome-Variable. Trotz aller sichtbaren Überschneidungen der Länderkategorien ist die Tendenz für eine höhere Geburtenrate in ärmeren Ländern nicht zu übersehen.
+
+
+## Erstellung eines Recipes
+Nachdem ich bereits einige Anpassungen (Hinzufügen und Umwandlung der Skalenniveaus von Variablen) vorgenommen habe, gibt es trotzdem noch kleineren Anpassungsbedarf für die Modellierung mit Klassifikationsmodellen. Diesen werde ich mit einem Recipe umsetzen.
+
+Es existiert noch eine unbenannte Variable, die beim Importieren der Daten als "x1" benannt wurde. Diese enthält fortlaufende Nummern zu jedem Datensatz, also eine Art ID. Diese Spalte ist für die Modellierung irrelevant und wird auch sonst, im Anschluss an die Modellierung nicht benötigt.
+
+Die Spalte "country" soll für die Modellierung nicht von Relevanz sein und die Rolle einer ID erhalten.
+
+Außerdem möchte ich gern alle Prädikatoren, die möglicherweise eine starke Korrelation zueinander aufweisen, aus einem potentiellen Modell ausschließen.
+
+Darüber hinaus schließe ich die Variable "GDP_per_capita" für die weitere Modellierung aus, da sie die gleichen Werte enthält, wie unsere kategoriale Response-Variable "GDP_per_capita_kat". Würden wir diesen Schritt nicht tun, hätten wir mit GDP_per_capita als Prediktor in unseren Modellen aller Voraussicht nach perfekte Modellergebnisse.
+
+```{r}
+WDI_rec <- # Objektname für das recipe
+  recipe(GDP_per_capita_kat ~ ., data = WDI_train, importance = TRUE) %>% # Definieren des recipes (Response-Variable ~ Prädikatoren)
+  update_role(country, new_role = "ID") %>% # Variable "country" erhält die Rolle "ID" und ist damit kein Prädikator mehr
+  step_rm(X1) %>% # Löschen der Spalte "X1"
+  step_rm(GDP_per_capita) %>% # Entfernen des Prädikators "GDP_per_capita", da er die gleichen Werte, wie unser Outcome, enthält.
+  step_rm(GDP) %>% # Entfernen dieses Prädikators, weil er zusammen mit "Population" eine 100% Korrelation zu unserem Outcome hat.
+  step_rm(Population) %>% # Entfernen des Prädikators, weil er zusammen mit "GDP" eine 100% Korrelation zu unserem Outcome hat.
+  step_corr(all_predictors()) # Entfernen aller Prädikatoren, die eine große Korrelation zueinander haben.
+  
+
+summary(WDI_rec) # Anzeige des Recipes inkl. Skalenniveau und Rolle der jeweiligen Variablen
+```
+
+
+# Modellierung
+
+## Modellbestimmung & Fitting
+
+In diesem Kapitel erstelle ich die Modelle, die im weiteren Verlauf trainiert und evaluiert werden sollen. Außerdem binde ich die Modelle und das oben definierte Recipe in einen Workflow ein.
+
+Im Ergebnis erhalte ich also pro Modell einen Workflow. Die Workflows kommen dann beim Training und der Evaluation der Modelle zum Einsatz. 
+
+**Logistische Regression:**  
+```{r}
+lr_mod <- 
+  logistic_reg() %>%
+  set_engine("glm")
+```
+
+```{r}
+WDI_rec_Wflow_lr_mod <- 
+  workflow() %>%
+  add_model(lr_mod) %>%
+  add_recipe(WDI_rec)
+
+WDI_rec_Wflow_lr_mod
+```
+
+**Random Forest:**  
+```{r}
+rf_mod <-
+  rand_forest() %>% 
+  set_engine("ranger", importance = "permutation") %>% 
+  set_mode("classification")
+```
+
+```{r}
+WDI_rec_wflow_rf_mod <- 
+  workflow() %>%
+  add_model(rf_mod) %>%
+  add_recipe(WDI_rec)
+
+WDI_rec_wflow_rf_mod
+```
+
+**XGBoost:**  
+```{r}
+xgb_mod <- 
+  boost_tree() %>% 
+  set_engine("xgboost") %>% 
+  set_mode("classification")
+```
+
+```{r}
+WDI_rec_wflow_xgb_mod <- 
+  workflow() %>%
+  add_model(xgb_mod) %>% 
+  add_recipe(WDI_rec)
+
+WDI_rec_wflow_xgb_mod
+```
+
+Besonders geeignet sind Workflows, wenn man unterschiedliche Recipes für unterschiedliche Modelle benötigt. So wird der Trainingsprozess stark vereinfacht und das Coding übersichtlicher. Das ist hier zwar nicht explizit der Fall, dennoch lassen sich Workflows anwenden und das Recipe mit dem Modell auf diese Weise verbinden.
+
+## Trainieren der Modelle
+
+Nun trainiere ich alle Modelle mithilfe der erstellten Workflows auf die Trainingsdaten.
+
+Im Rahmen des Workflows wird entsprechend das erstellte und dort eingebundene Recipe angewendet und das Modell, auf Basis der verbleibenden Variablen / Predikatoren, trainiert.
+
+
+### K-fold cross validation
+
+Das Trainieren und Evaluieren der Modelle erfolgt mit der k-fold cross-validation als Resampling-Methode.
+Das daraus am besten performende Modell wird am Ende dieser Arbeit dann erneut trainiert und auf die Testdaten angewendet.
+
+```{r}
+### Erstellen der k-fold cross validation
+
+set.seed(123) # Ermöglicht das wiederholte Ausführen der k-fold cross-validation mit gleichem Ergebnis.
+
+cv_folds <- vfold_cv(WDI_train, v = 5) # Ausführen der 5-fold cross-validation und Speichern als neues Objekt.
+
+```
+
+### Logistische Regression
+
+```{r}
+WDI_fit_lr_mod <- 
+  WDI_rec_Wflow_lr_mod %>% 
+  fit_resamples(resamples = cv_folds, control = control_resamples(save_pred = TRUE))
+```
+
+### Random Forest
+```{r}
+WDI_fit_rf_mod <- 
+  WDI_rec_wflow_rf_mod %>% 
+  fit_resamples(resamples = cv_folds, control = control_resamples(save_pred = TRUE))
+```
+
+### XGBoost
+
+```{r}
+WDI_fit_xgb_mod <- 
+  WDI_rec_wflow_xgb_mod %>% 
+  fit_resamples(resamples = cv_folds, control = control_resamples(save_pred = TRUE))
+
+```
+
+## Evaluation der Modelle
+
+In diesem Schritt, der Evaluation der Modelle, schauen wir uns die individuelle Performance eines jeden Workflows inkl. Modell auf den Trainingsdaten an, um das beste Modell zu identiizieren, welches auf den Trainingsdaten zunächst am besten performt, um dann später für eine Vorhersage auf den neuen Testdaten angewendet zu werden.
+
+### Logistische Regression
+
+An dieser Stelle schauen wir uns zunächst die "Accuracy" und "roc_auc" als Metriken für die Performance des Modells an, indem wir die Funktion collect_metrics() auf den trainierten Workflow anwenden.
+
+Zunächst die Performance über alle Folds aus dem Resampling:
+```{r}
+WDI_fit_lr_mod %>% 
+  collect_metrics(summarize = FALSE) # Ausgabe von Accuracy und ROC_AUC für jedes der Folds
+```
+
+Anschließend die Performance im Durchschnitt über alle Folds:
+
+```{r}
+lr_acc_roc <- WDI_fit_lr_mod %>% 
+  collect_metrics(summarize = TRUE) # Ausgabe von Accuracy und ROC_AUC als Durchschnitt über alle Folds
+lr_acc_roc
+```
+
+Die Accuracy liegt bei 88,4 % und der roc-auc bei 0,952. Das sind bereits sehr gute Ergebnisse zur Vorhersagegenauigkeit eines Klassifikationsmodells. 
+Das Modell der logistischen Regression sagt bereits 88,4% aller Fälle korrekt vorher.
+
+Schauen wir uns die durchschnittliche Vorhersagequalität des Modells auf den Folds aus unserem Resampling-Prozess etwas genauer an. Insbesondere im Hinblick auf die Fehler, die gemacht werden.
+
+Dafür geben wir uns zunächst eine Darstellung der Vorhersagen über alle Folds aus und schauen uns daran anschließend die ROC-Kurven des Modells an.
+```{r}
+# Ausgabe der VOrhersageergebnisse (sowohl Wahrscheinlichkeiten, als auch die Vorhersageklassen)
+
+lr_pred <- collect_predictions(WDI_fit_lr_mod, summarize = TRUE) # Ausgabe der Predictions auf den Testteil der 5-folds
+lr_pred
+
+# Erstellung einer ROC-Kurve für die Performance der einzelnen Folds
+WDI_fit_lr_mod %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity, color = id)) + 
+  geom_path(show.legend=TRUE, size = 1.6) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  theme_light() + 
+  ggtitle("ROC-Kurve pro Fold") + 
+  labs(color="Legende")
+
+# Erstellung einer ROC-Kurve für die durchschnittliche Performance über alle Durchläufe
+WDI_fit_lr_mod %>% 
+  collect_predictions() %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity)) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  geom_path(color = "#A2CD5A", size = 1.6) + 
+  theme_light() + 
+  ggtitle("ROC-Kurve als Durchschnitt über alle Folds")
+
+```
+
+An der ersten ROC-Kurve unseres trainierten Modells sehen wir, dass die Performance über alle Folds relativ ähnlich ist. Lediglich der Fold 3 scheint an dieser Stelle eine schlechtere Performance, gemessen an der AUC, aufzuweisen.
+
+Insgesamt, in der ROC-Kurve über alle Folds, schneidet dieser Algorithmus allerdings schon sehr gut ab, was an dem sehr hohen ROC-AUC-Wert von 0,952 bereits deutlich wurde.
+
+Erstellen wir im nächsten Schritt eine Confusion Matrix. Diese eignet sich zur Identifikation der Fehlerschwerpunkte und gibt diese in einer tabellarischen Übersicht aus.
+
+```{r}
+# Erstellen einer Confusion Matrix
+
+lr_cf <- conf_mat_resampled(WDI_fit_lr_mod) # Ausgabe einer Confusion Matrix als Durchschnitt über alle Durchläufe der 5-fold cross val.
+lr_cf # Anzeige der Conf.Matrix
+```
+
+Berechnen wir an dieser Stelle die Precision, Recall und den F1-Score für die Performance des Modells auf den Trainingsdaten.
+
+```{r}
+lr_prec <- precision(data = lr_pred, truth = lr_pred$GDP_per_capita_kat, estimate = lr_pred$.pred_class)
+lr_prec # Anzeige Precision
+
+lr_rec <- recall(data = lr_pred, truth = lr_pred$GDP_per_capita_kat, estimate = lr_pred$.pred_class)
+lr_rec # Anzeige Recall
+
+lr_f <- f_meas(data = lr_pred, truth = lr_pred$GDP_per_capita_kat, estimate = lr_pred$.pred_class)
+lr_f # Ausgabe des F1-Score
+```
+
+Der Recall liegt bei guten 0,75, während die Precision bei guten 0,79 liegt.
+Wir haben also in dem Modell der logistischen Regression an dieser Stelle ein häufigeres Auftreten von "false negatives" als "false positives". Das harmonische Mittel von Precision und Recall (F1-Score) liegt bei 0,771.
+
+In der Praxis bestünde nun die Möglichkeit noch das Hyperparametertuning für den Algorithmus anzugehen. Beispielsweise könnte es sinnhaft sein, den Threshold im Rahmen des Tunings zu verändern. Dies würde es möglich machen, entweder die Precision oder den Recall noch etwas zu justieren, um das definierte Ziel für dieses Modell noch besser erreichen zu können. 
+
+Das Thema Hyperparametertuning findet allerdings im Rahmen dieser Arbeit keine weitere Anwendung, weshalb wir auf weitere Optimierungen verzichten.
+
+### Random Forest
+
+An dieser Stelle schauen wir uns zunächst die "Accuracy" und "roc_auc" als Metriken für die Performance des Modells an, indem wir die Funktion collect_metrics() auf den trainierten Workflow anwenden.
+
+Schauen wir uns zunächst die beide Metriken pro Fold aus dem Resampling an:
+
+```{r}
+WDI_fit_rf_mod %>% 
+  collect_metrics(summarize = FALSE) # Ausgabe von Accuracy und ROC_AUC für jedes der Folds
+
+```
+
+Anschließend die Performance im Durchschnitt über alle Folds:
+
+```{r}
+rf_acc_roc <- WDI_fit_rf_mod %>% 
+  collect_metrics(summarize = TRUE) # Ausgabe von Accuracy und ROC_AUC als Durchschnitt über alle Folds
+rf_acc_roc
+```
+
+Die durchschnittliche Accuracy über alle 5 Durchläufe der k-fold cross validation liegt bei 0,884, während der roc_auc bei 0,97 liegt.
+Das sind noch etwas bessere Werte, als bei der logistischen Regression. 
+
+Aber auch hier ist wieder interessant, wo die Fehler im Schwerpunkt gemacht werden und wie Precisionm, Recall und die ROC-Kurven des Modells in diesem Zusammenhang aussehen.
+
+```{r}
+# Ausgabe der Vorhersageergebnisse (sowohl Wahrscheinlichkeiten, als auch die Vorhersageklassen)
+
+rf_pred <- collect_predictions(WDI_fit_rf_mod, summarize = TRUE) # Ausgabe der Predictions auf den Testteil der 5-folds
+rf_pred
+
+# Erstellung einer ROC-Kurve für die Performance der einzelnen Folds
+WDI_fit_rf_mod %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity, color = id)) + 
+  geom_path(show.legend=TRUE, size = 1.6) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  theme_light() + 
+  ggtitle("ROC-Kurve pro Fold") + 
+  labs(color="Legende")
+
+# Erstellung einer ROC-Kurve für die durchschnittliche Performance über alle Durchläufe
+WDI_fit_rf_mod %>% 
+  collect_predictions() %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity)) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  geom_path(color = "#A2CD5A", size = 1.6) + 
+  theme_light() + 
+  ggtitle("ROC-Kurve als Durchschnitt über alle Folds")
+
+```
+
+Beim Random Forest verlaufen die ROC-Kurven nahezu vergleichbar mit denen bei der logistischen Regression. Die Performance dieses Modells, gemessen an der AUC, ist sehr vergleichbar. Am ROC-AUC-Wert haben wir gesehen, dass sie beim Random Forest mit 0,97 geringfügig besser zu sein scheint, als bei der logistischen Regression.
+
+An der ROC-Kurve über alle DUrchläufe der 5-fold cross-validation ist das optisch aber nicht sofort ersichtlich.
+
+Wir erstellen uns auch für dieses Modell eine Confusion Matrix und wenden die eben erstellten Funktionen für Recall und Precision auf die Confusion Matrix des Random Forest an.
+
+```{r}
+rf_cf <- conf_mat_resampled(WDI_fit_rf_mod)
+rf_cf
+
+```
+An der Confusion Matrix wird bereits ersichtlich, dass durchschnittlich nicht viele Fehler gemacht wurden.
+Allerdings treten durchschnittlich mehr "false-negatives", als "false-positives" auf.
+
+Berechnen wir an dieser Stelle die Precision und den Recall für die Performance des Modells auf den Trainingsdaten.
+
+```{r}
+rf_prec <- precision(data = rf_pred, truth = rf_pred$GDP_per_capita_kat, estimate = rf_pred$.pred_class)
+rf_prec # Anzeige Precision
+
+rf_rec <- recall(data = rf_pred, truth = rf_pred$GDP_per_capita_kat, estimate = rf_pred$.pred_class)
+rf_rec # Anzeige Recall
+
+rf_f <- f_meas(data = rf_pred, truth = rf_pred$GDP_per_capita_kat, estimate = rf_pred$.pred_class)
+rf_f # Ausgabe des F1-Score
+```
+
+Der Recall liegt bei 0,72 während die Precision einen Wert von 0,81 annimmt. Dass die Precision höher ausfallen wird, als der Recall haben wir ja bereits, anhand der Confusion Matrix, erkennen können. Der F1-Score liegt bei 0,765.
+
+Die Performance des Random Forest-Modells, anhand von Accuracy, roc_auc und Precision beurteilt, ist etwas besser als die der logistischen Regression. Allerdings ist der Recall etwas niedriger, ebenso der F1-Score.
+
+### XGBoost
+An dieser Stelle schauen wir uns wieder die "Accuracy" und "roc_auc" als Metriken für die Performance des Modells an, indem wir die Funktion collect_metrics() auf den trainierten Workflow anwenden.
+
+Zunächst betrachten wir wieder die Performance in jedem Fold und anschließend im Durchschnitt über alle Folds:
+```{r}
+WDI_fit_xgb_mod %>% 
+  collect_metrics(summarize = FALSE) # Ausgabe von Accuracy und ROC_AUC für jedes der Folds
+
+xgb_acc_roc <- WDI_fit_xgb_mod %>% 
+  collect_metrics(summarize = TRUE) # Ausgabe von Accuracy und ROC_AUC als Durchschnitt über alle Folds
+xgb_acc_roc 
+```
+
+Die durchschnittliche Accuracy über alle Durchläufe beträgt 0,863 und der roc_auc-Wert beträgt 0,958.
+
+Grafisch können wir uns dies wieder mit den ROC-Kurven für jedes Fold und der ROC-Kurve über alle Folds anschauen.
+Hierfür geben wir uns zunächst die Vorhersageergebnisse aus und plotten darauf aufbauend dann die ROC-Kurven.
+
+```{r}
+# Ausgabe der Vorhersageergebnisse (sowohl Wahrscheinlichkeiten, als auch die Vorhersageklassen)
+
+xgb_pred <- collect_predictions(WDI_fit_xgb_mod, summarize = TRUE) # Ausgabe der Predictions auf den Testteil der 5-folds
+xgb_pred
+
+# Erstellung einer ROC-Kurve für die Performance der einzelnen Folds
+WDI_fit_xgb_mod %>% 
+  collect_predictions() %>% 
+  group_by(id) %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity, color = id)) + 
+  geom_path(show.legend=TRUE, size = 1.6) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  theme_light() + 
+  ggtitle("ROC-Kurve pro Fold") + 
+  labs(color="Legende")
+
+# Erstellung einer ROC-Kurve für die durchschnittliche Performance über alle Durchläufe
+WDI_fit_xgb_mod %>% 
+  collect_predictions() %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity)) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  geom_path(color = "#A2CD5A", size = 1.6) + 
+  theme_light() + 
+  ggtitle("ROC-Kurve als Durchschnitt über alle Folds")
+
+```
+
+Schauen wir uns auch hier die Confusion Matrix des XGBoost an. Es lässt sich daran gut erkennen, wo Fehler auftreten und welche Fehlerart am dominantesten ist. Außerdem ermitteln wir erneut, auch für dieses Modell, Precision und Recall.
+
+```{r}
+xgb_cf <- conf_mat_resampled(WDI_fit_xgb_mod)
+xgb_cf
+```
+
+```{r}
+xgb_prec <- precision(data = xgb_pred, truth = xgb_pred$GDP_per_capita_kat, estimate = xgb_pred$.pred_class)
+xgb_prec # Anzeige Precision
+
+xgb_rec <- recall(data = xgb_pred, truth = xgb_pred$GDP_per_capita_kat, estimate = xgb_pred$.pred_class)
+xgb_rec # Anzeige Recall
+
+xgb_f <- f_meas(data = xgb_pred, truth = xgb_pred$GDP_per_capita_kat, estimate = xgb_pred$.pred_class)
+xgb_f # Ausgabe des F1-Score
+```
+Die Precision für das XGBoost-Modell beträgt 0,743 und der Recall, ebenfalls wie im Random Forest, 0,72.
+Auch der F1-Score, als harmonisches Mittel zwischen Precision und Recall, liegt beim XGBoost nur noch bei 0,732.
+Damit ist die Performance (über alle Durchläufe im Durchschnitt) des XGBoost nicht so gut, wie Ergebnisse des Random Forest-Algorithmus.
+
+# Auswahl des besten Modells
+
+Alle drei Modelle haben eine relativ gute Performance, was die Vorhersage des Status "rich" oder "poor" eines Landes anhand der im Datensatz enthaltenen Entwicklungsdaten angeht. Die Unterschiede in der Performance der Modelle sind in sich relativ gering.
+
+Um uns die Ergebnisse der einzelnen Modelle, die wir in diesem Notebook trainiert und mittels k-fold cross validation evaluiert haben, noch einmal in Erinnerung zu rufen, bereiten wir uns diese als tabellarische, strukturierte Übersicht noch einmal auf.
+
+```{r}
+mod_res <- 
+  tibble(Model = "Logistic Regression", Accuracy = lr_acc_roc$mean[1], roc_auc = lr_acc_roc$mean[2], Precision = lr_prec$.estimate, Recall = lr_rec$.estimate, F1 = lr_f$.estimate) %>% 
+  add_row(Model = "Random Forest", Accuracy = rf_acc_roc$mean[1], roc_auc = rf_acc_roc$mean[2], Precision = rf_prec$.estimate, Recall = rf_rec$.estimate, F1 = rf_f$.estimate) %>% 
+  add_row(Model = "XGBoost Klassifikation", Accuracy = xgb_acc_roc$mean[1], roc_auc = xgb_acc_roc$mean[2], Precision = xgb_prec$.estimate, Recall = xgb_rec$.estimate, F1 = xgb_f$.estimate) 
+
+mod_res  # Ausgabe des erstellten Tibbles mit allen Performanceparametern der trainierten Modelle
+```
+
+Die beste Performance anhand von Accuracy, ROC-AUC-Wert und Precision hat das Random Forest-Modell. 
+Die Vorhersagegenauigkeit/Treffergenauigkeit der Vorhersagen ist bei diesem Modell demnach am Höchsten.
+Die logistische Regression ist "Klassenbeste" beim F-Score, allerdings ist der Random Forest nicht weit von ihr entfernt.
+
+Der ROC-AUC-Wert liegt bei allen Modellen sehr nahe beieinander. Dennoch liegt der Wert des Random Forest-Modells noch etwas über dem der anderen Modelle. Leidlgich der Recall und der F-Score erreichen beim Random Forest nicht die besten Werte.
+
+Entsprechend der guten Werte bei der Accuracy, dem ROC-AUC-Wert und der von uns, aus der Zielsetzung dieser Arbeit heraus, möglichst hoch gewünschten Precision, wenden wir im folgenden den Random Forest-Algorithmus auf unsere Testdaten an. Der F1-Score liegt bei allen Modellen relativ nahe beieinander.
+
+## Vorhersage & Evaluation
+
+Um das ausgewählte Modell auf die Testdaten anzuwenden, trainiere ich es zunächst auf die eingangs erstellten Trainingsdaten (ohne Resampling), um dann eine Vorhersage auf den Testdaten vorzunehmen.
+Um diesen Prozess zu verschlanken, verwende ich die Funktion last_fit().
+
+```{r}
+final_rf <- 
+  WDI_rec_wflow_rf_mod %>%
+  last_fit(WDI_split)
+
+final_rf # Ausgabe der Results aus dem last_fit()
+```
+
+
+```{r}
+final_rf$.workflow[[1]] # Ausgabe der Modellkoeffizienten des Random Forest
+
+```
+In den Modellkoeffizienten finden wir einige interessante Angaben zum Modell, welches wir hier erstellt haben. 
+
+Im Rahmen des Trainings mit dem Random Forest-Algorithmus wurden 500 Entscheidungsbäume (500 verschiedene Modelle) erstellt und für das Training verwendet. Es wurden 8 Variablen (analog zu unserem Recipe) für das Trainieren des Modells genutzt. Die Stichprobengröße, mit der an dieser STelle trainiert wurde, betrug 138 Datensätze (da entspricht der Größe des Trainingsdatensatzes).
+
+
+```{r}
+# Berechnung relevanter Performance-Parameter (Accuracy und ROC-AUC-Wert)
+
+collect_metrics(final_rf) # Ausgabe von Accuracy und ROC-AUC-Wert
+```
+
+Die Accuracy des finalen Random Forest-Modells liegt bei 0,957. Demnach werden 95,7% aller Vorhersagen auf den Testdaten korrekt getroffen.
+Der ROC-AUC-Wert liegt bei sehr guten, nahezu perfekten, 0,994.
+
+Schauen wir uns in diesem Zusammenhang kurz die ROC-Kurve dieses finalen Modells an.
+
+```{r}
+# Erstellung der ROC-Kurve
+
+final_rf %>% 
+  collect_predictions() %>% 
+  roc_curve(GDP_per_capita_kat, .pred_rich) %>% 
+  ggplot(aes(1-specificity, sensitivity)) + 
+  geom_abline(lty=2, color = "#666666", size = 1) +
+  geom_path(color = "#A2CD5A", size = 1.6) + 
+  theme_light() + 
+  ggtitle("ROC-Kurve des finalen Random Forest-Modells")
+
+```
+
+Wie schon der AUC (Area under the curve) Wert zeigte, ist der Verlauf der ROC-Kurve nahezu optimal. Die Performance des final trainierten Modells ist entsprechend hoch.
+
+Mit collect_predictions() können wir uns die Vorhersagen des finalen Modells auf dem Testdatenteil anschauen.
+
+```{r}
+# Ausgabe der Vorhersagen auf den Testdaten (sowohl Wahrscheinlichkeiten als auch die VOrhersageklassen)
+
+final_pred_rf <- collect_predictions(final_rf)
+final_pred_rf
+```
+
+Schauen wir uns an der Stelle noch einmal eine Confusion Matrix des auf die Testdaten angewendeten Modells an. Daraus wird schnell und übersichtlich klar, an welchen Stellen dem Modell noch Fehler unterlaufen sind.
+
+```{r}
+table(Prediction = final_pred_rf$.pred_class, Truth = final_pred_rf$GDP_per_capita_kat) # Ausgabe der Confusion Matrix unseres Modells
+```
+
+Aus der Confusion Matrix wird deutlich, dass 44/46 Fällen korrekt vorhergesagt wurden.
+Es gibt keinen einzigen "false-positive"-Fall bei der Vorhersage auf den Testdaten.
+Es haben sich zwei "false-negative"-Fälle bei Anwendung des trainierten Modells auf die Testdaten ergeben.
+
+Berechnen wir uns dazu noch Precision und Recall als wichtige Performanceparameter für das Random Forest-Modell an.
+
+```{r}
+# Berechnung von Precision und Recall
+
+precision(data = final_pred_rf, truth = final_pred_rf$GDP_per_capita_kat, estimate = final_pred_rf$.pred_class)
+
+recall(data = final_pred_rf, truth = final_pred_rf$GDP_per_capita_kat, estimate = final_pred_rf$.pred_class)
+
+f_meas(data = final_pred_rf, truth = final_pred_rf$GDP_per_capita_kat, estimate = final_pred_rf$.pred_class)
+```
+
+Wir stellen fest, dass das Modell mit dem Random Forest-Algorithmus sehr gut, sogar etwas besser als auf den Trainingsdaten, auf den Testdaten performt. Unsere erste Evaluation des Random Forest-Modells mithilfe von Resampling auf den Trainingsdaten sah etwas schwächer aus - wenn auch der Random Forest-Algorithmus bereits der beste der drei trainierten Algorithmen war.
+
+Der Recall liegt bei 0,89, während die Precision einen perfekten Wert von 1 einnimmt. Das harmonische Mittel dieser beiden Metriken liegt bei 0,944.
+
+Das sind nahezu perfekte Vorhersageergebnisse des Modells auf den Testdaten. Das Modell scheint sehr gut mit neuen Daten umgehen zu können.
+
+# Zusammenfassung/Fazit
+
+Auf den Testdaten performt das Random Forest-Modell einwandfrei. 
+
+Die (nach Ausschluss von 5 Variablen im Recipe mit step_rm()) verbleibenden 8 Prädikatoren scheinen hier im Random Forest-Algorithmus ein nahezu perfektes Ergebnis zu liefern.
+
+Schauen wir uns an dieser Stelle einmal einen VI-Plot an, um abschließend zu bewerten, welche Variablen als Prediktoren von besonders hoher Relevanz für die Modellierung waren.
+
+```{r}
+# Erstellung des Variable Importance Plots
+
+final_rf_vip <- 
+  WDI_rec_wflow_rf_mod %>% 
+  fit(data = WDI_train) %>%
+  pull_workflow_fit() %>%
+  vip(fill = "#A2CD5A")+
+  theme_light() + 
+  ggtitle("Variable Importance Plot des RF")
+
+final_rf_vip # Ausgabe des VI-Plots
+
+```
+
+An dem VI-Plot können wir sehen, dass zwei bzw. drei ganz dominante Variablen für die guten Ergebnisse dieses Modells verantwortlich waren.
+Insbesondere die Variablen Server und Internet_User_pp sind von besonders großer Bedeutung, um unsere Response-Variable zu erklären. 
+
+Alle weiteren Prediktorvariablen, die in diesem Modell verwendet wurden, haben deutlich geringere Auswirkungen auf die Vorhersagekraft des Modells, wobei die Variable Birth_rate immer noch eine nicht zu unterschätzuende Rolle zu spielen scheint.
+
+Das eingangs gesteckte Ziel der verlässlichen Vorhersage des Status eines Landes (arm oder reich) anhand der vorliegenden Entwicklungsdaten mithilfe eines dieser Modelle, funktioniert mit dem hier trainierten Algorithmus sehr gut. Mit einer Vorhersagegenauigkeit von 95,7% (Accuracy) schafft es der Random Forest sehr erfolgreich ein Land korrekt in die Kategorien "arm" oder "reich" einzustufen.
+
+Sowohl die Accuracy, der ROC-AUC-Wert, aber insbesondere die Precision waren uns eingangs als Performanceparameter sehr wichtig.
+Bei der Precision erzielt der Random Forest-Algorithmus bei der Vorhersage auf den Testdaten ein perfektes Ergebnis von 1. Das ist in unserem Fall sehr wünschenswert und macht den Random Forest an dieser Stelle sehr geeignet.
+
+
+
+
+
+&copy; Sebastian Wölk
+

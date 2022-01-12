@@ -1,0 +1,3147 @@
+<?xml version="1.0"?>
+<AlteryxDocument yxmdVer="2021.3">
+  <Nodes>
+    <Node ToolID="31">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="124" y="192" width="1274" height="608" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Data Loading &amp; Preparation &amp; Feature Engineering</Caption>
+          <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="1">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="150" y="281" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File OutputFileName="" RecordLimit="" SearchSubDirs="False" FileFormat="25">C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Zeitreihe_Lagerfüllgrad_AKL.xlsx|||`Tabelle1$`</File>
+              <FormatSpecificOptions>
+                <FirstRowData>False</FirstRowData>
+                <ImportLine>1</ImportLine>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Zeitreihe_Lagerfüllgrad_AKL.xlsx
+Query=`Tabelle1$`</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="Füllgrad" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Zeitreihe_Lagerfüllgrad_AKL.xlsx|||`Tabelle1$`" type="Double" />
+                <Field name="File_Date" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Zeitreihe_Lagerfüllgrad_AKL.xlsx|||`Tabelle1$`" type="Date" />
+                <Field name="Anzahl Stellplätze" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Zeitreihe_Lagerfüllgrad_AKL.xlsx|||`Tabelle1$`" type="Double" />
+                <Field name="Freie Plätze" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Zeitreihe_Lagerfüllgrad_AKL.xlsx|||`Tabelle1$`" type="Double" />
+                <Field name="Belegte Plätze" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Zeitreihe_Lagerfüllgrad_AKL.xlsx|||`Tabelle1$`" type="Double" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="2">
+          <GuiSettings>
+            <Position x="270" y="294" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="Numeric Up Down (28)">1</Value>
+              <Value name="Numeric Up Down (25)">30</Value>
+              <Value name="Drop Down (42)">Belegte Plätze</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Lag Data: Belegte Plätze</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Lag Records\LagRecords.yxmc" />
+        </Node>
+        <Node ToolID="3">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="366" y="294" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="False" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="Anzahl Stellplätze" selected="True" type="Int32" size="4" />
+                <SelectField field="Freie Plätze" selected="True" type="Int32" size="4" />
+                <SelectField field="Belegte Plätze" selected="True" type="Int32" size="4" />
+                <SelectField field="DayofWeek_DEU" selected="True" type="Int32" size="4" />
+                <SelectField field="Lag-1" selected="True" rename="Belegte Plätze_Lag-1" type="Int32" size="4" />
+                <SelectField field="Lag-2" selected="True" rename="Belegte Plätze_Lag-2" type="Int32" size="4" />
+                <SelectField field="Lag-3" selected="True" rename="Belegte Plätze_Lag-3" type="Int32" size="4" />
+                <SelectField field="Lag-4" selected="True" rename="Belegte Plätze_Lag-4" type="Int32" size="4" />
+                <SelectField field="Lag-5" selected="True" rename="Belegte Plätze_Lag-5" type="Int32" size="4" />
+                <SelectField field="Lag-6" selected="True" rename="Belegte Plätze_Lag-6" type="Int32" size="4" />
+                <SelectField field="Lag-7" selected="True" rename="Belegte Plätze_Lag-7" type="Int32" size="4" />
+                <SelectField field="Lag-8" selected="True" rename="Belegte Plätze_Lag-8" type="Int32" size="4" />
+                <SelectField field="Lag-9" selected="True" rename="Belegte Plätze_Lag-9" type="Int32" size="4" />
+                <SelectField field="Lag-10" selected="True" rename="Belegte Plätze_Lag-10" type="Int32" size="4" />
+                <SelectField field="Lag-11" selected="True" rename="Belegte Plätze_Lag-11" type="Int32" size="4" />
+                <SelectField field="Lag-12" selected="True" rename="Belegte Plätze_Lag-12" type="Int32" size="4" />
+                <SelectField field="Lag-13" selected="True" rename="Belegte Plätze_Lag-13" type="Int32" size="4" />
+                <SelectField field="Lag-14" selected="True" rename="Belegte Plätze_Lag-14" type="Int32" size="4" />
+                <SelectField field="Lag-15" selected="True" rename="Belegte Plätze_Lag-15" type="Int32" size="4" />
+                <SelectField field="Lag-16" selected="True" rename="Belegte Plätze_Lag-16" type="Int32" size="4" />
+                <SelectField field="Lag-17" selected="True" rename="Belegte Plätze_Lag-17" type="Int32" size="4" />
+                <SelectField field="Lag-18" selected="True" rename="Belegte Plätze_Lag-18" type="Int32" size="4" />
+                <SelectField field="Lag-19" selected="True" rename="Belegte Plätze_Lag-19" type="Int32" size="4" />
+                <SelectField field="Lag-20" selected="True" rename="Belegte Plätze_Lag-20" type="Int32" size="4" />
+                <SelectField field="Lag-21" selected="True" rename="Belegte Plätze_Lag-21" type="Int32" size="4" />
+                <SelectField field="Lag-22" selected="True" rename="Belegte Plätze_Lag-22" type="Int32" size="4" />
+                <SelectField field="Lag-23" selected="True" rename="Belegte Plätze_Lag-23" type="Int32" size="4" />
+                <SelectField field="Lag-24" selected="True" rename="Belegte Plätze_Lag-24" type="Int32" size="4" />
+                <SelectField field="Lag-25" selected="True" rename="Belegte Plätze_Lag-25" type="Int32" size="4" />
+                <SelectField field="Lag-26" selected="True" rename="Belegte Plätze_Lag-26" type="Int32" size="4" />
+                <SelectField field="Lag-27" selected="True" rename="Belegte Plätze_Lag-27" type="Int32" size="4" />
+                <SelectField field="Lag-28" selected="True" rename="Belegte Plätze_Lag-28" type="Int32" size="4" />
+                <SelectField field="Lag-29" selected="True" rename="Belegte Plätze_Lag-29" type="Int32" size="4" />
+                <SelectField field="Lag-30" selected="True" rename="Belegte Plätze_Lag-30" type="Int32" size="4" />
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <AnnotationText>Anpassung von Datentypen</AnnotationText>
+              <DefaultAnnotationText>Anpassung von Datentypen</DefaultAnnotationText>
+              <Left value="True" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+        <Node ToolID="4">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Filter.Filter">
+            <Position x="1026" y="546" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Mode>Simple</Mode>
+              <Simple>
+                <Operator>&gt;=</Operator>
+                <Field>File_Date</Field>
+                <Operands>
+                  <IgnoreTimeInDateTime>True</IgnoreTimeInDateTime>
+                  <DateType>fixed</DateType>
+                  <PeriodDate>2021-10-21 17:20:41</PeriodDate>
+                  <PeriodType>days</PeriodType>
+                  <PeriodCount>0</PeriodCount>
+                  <Operand>2019-01-01</Operand>
+                  <StartDate>2021-10-21 17:20:41</StartDate>
+                  <EndDate>2021-10-21 17:20:41</EndDate>
+                </Operands>
+              </Simple>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>[File_Date] &gt;= "2019-01-01"</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFilter" />
+        </Node>
+        <Node ToolID="5">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1110" y="642" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Anzeige der vorbereiteten Daten</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="6">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="1170" y="330" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="True" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="Anzahl Stellplätze" selected="True" />
+                <SelectField field="Belegte Plätze" selected="True" />
+                <SelectField field="Belegte Plätze_Lag-1" selected="True" />
+                <SelectField field="File_Date" selected="True" />
+                <SelectField field="Freie Plätze" selected="True" />
+                <SelectField field="Füllgrad" selected="True" />
+                <SelectField field="MA_7" selected="True" />
+                <SelectField field="MA_14" selected="True" />
+                <SelectField field="MA_30" selected="True" />
+                <SelectField field="MA_200" selected="True" />
+                <SelectField field="MA_90" selected="True" />
+                <SelectField field="Diff_MA200-MA90" selected="True" />
+                <SelectField field="Diff_MA200-MA30" selected="True" />
+                <SelectField field="Diff_MA200-MA14" selected="True" />
+                <SelectField field="Diff_MA200-MA7" selected="True" />
+                <SelectField field="Diff_MA200-Target" selected="True" />
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+        <Node ToolID="7">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Filter.Filter">
+            <Position x="1098" y="522" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Mode>Simple</Mode>
+              <Simple>
+                <Operator>&lt;=</Operator>
+                <Field>File_Date</Field>
+                <Operands>
+                  <IgnoreTimeInDateTime>True</IgnoreTimeInDateTime>
+                  <DateType>fixed</DateType>
+                  <PeriodDate>2021-10-21 17:28:54</PeriodDate>
+                  <PeriodType>days</PeriodType>
+                  <PeriodCount>0</PeriodCount>
+                  <Operand>2021-07-31</Operand>
+                  <StartDate>2021-10-21 17:28:54</StartDate>
+                  <EndDate>2021-10-21 17:28:54</EndDate>
+                </Operands>
+              </Simple>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>[File_Date] &lt;= "2021-07-31"</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFilter" />
+        </Node>
+        <Node ToolID="8">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1314" y="426" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="9">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1218" y="570" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="14">
+          <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+            <Position x="497" y="449" width="507" height="204" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Caption>Berechnung Bollinger Bands</Caption>
+              <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+              <Disabled value="False" />
+              <Folded value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <ChildNodes>
+            <Node ToolID="10">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="522" y="498" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>MA_20</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="20" />
+                  <Expression>Average(
+[Row-20:Belegte Plätze],
+[Row-19:Belegte Plätze],
+[Row-18:Belegte Plätze],
+[Row-17:Belegte Plätze],
+[Row-16:Belegte Plätze],
+[Row-15:Belegte Plätze],
+[Row-14:Belegte Plätze],
+[Row-13:Belegte Plätze],
+[Row-12:Belegte Plätze],
+[Row-11:Belegte Plätze],
+[Row-10:Belegte Plätze],
+[Row-9:Belegte Plätze],
+[Row-8:Belegte Plätze],
+[Row-7:Belegte Plätze],
+[Row-6:Belegte Plätze],
+[Row-5:Belegte Plätze],
+[Row-4:Belegte Plätze],
+[Row-3:Belegte Plätze],
+[Row-2:Belegte Plätze],
+[Row-1:Belegte Plätze])</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>MA 20</AnnotationText>
+                  <DefaultAnnotationText>Average(
+[Row-20:Belegte Plätze],
+[Row-19:Belegte Plätze],
+[R...</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="11">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="618" y="498" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>Var 20</CreateField_Name>
+                  <CreateField_Type>Int64</CreateField_Type>
+                  <CreateField_Size>8</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="20" />
+                  <Expression><![CDATA[Average((([Row-1:Belegte Plätze]-[MA_20])*([Belegte Plätze]-[MA_20])),
+(([Row-2:Belegte Plätze]-[MA_20])*([Row-2:Belegte Plätze]-[MA_20])),
+(([Row-3:Belegte Plätze]-[MA_20])*([Row-3:Belegte Plätze]-[MA_20])),
+(([Row-4:Belegte Plätze]-[MA_20])*([Row-4:Belegte Plätze]-[MA_20])),
+(([Row-5:Belegte Plätze]-[MA_20])*([Row-5:Belegte Plätze]-[MA_20])),
+(([Row-6:Belegte Plätze]-[MA_20])*([Row-6:Belegte Plätze]-[MA_20])),
+(([Row-7:Belegte Plätze]-[MA_20])*([Row-7:Belegte Plätze]-[MA_20])),
+(([Row-8:Belegte Plätze]-[MA_20])*([Row-8:Belegte Plätze]-[MA_20])),
+(([Row-9:Belegte Plätze]-[MA_20])*([Row-9:Belegte Plätze]-[MA_20])),
+(([Row-10:Belegte Plätze]-[MA_20])*([Row-10:Belegte Plätze]-[MA_20])),
+(([Row-11:Belegte Plätze]-[MA_20])*([Row-11:Belegte Plätze]-[MA_20])),
+(([Row-12:Belegte Plätze]-[MA_20])*([Row-12:Belegte Plätze]-[MA_20])),
+(([Row-13:Belegte Plätze]-[MA_20])*([Row-13:Belegte Plätze]-[MA_20])),
+(([Row-14:Belegte Plätze]-[MA_20])*([Row-14:Belegte Plätze]-[MA_20])),
+(([Row-15:Belegte Plätze]-[MA_20])*([Row-15:Belegte Plätze]-[MA_20])),
+(([Row-16:Belegte Plätze]-[MA_20])*([Row-16:Belegte Plätze]-[MA_20])),
+(([Row-17:Belegte Plätze]-[MA_20])*([Row-17:Belegte Plätze]-[MA_20])),
+(([Row-18:Belegte Plätze]-[MA_20])*([Row-18:Belegte Plätze]-[MA_20])),
+(([Row-19:Belegte Plätze]-[MA_20])*([Row-19:Belegte Plätze]-[MA_20])),
+(([Row-20:Belegte Plätze]-[MA_20])*([Row-20:Belegte Plätze]-[MA_20])))
+]]></Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>Var 20</AnnotationText>
+                  <DefaultAnnotationText>Average((([Row-1:Belegte Plätze]-[MA_20])*([Belegte Plätze]-[...</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="12">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.Formula.Formula">
+                <Position x="714" y="498" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <FormulaFields>
+                    <FormulaField expression="SQRT([Var 20])" field="STD_MA20" size="4" type="Int32" />
+                    <FormulaField expression="[MA_20]+[STD_MA20]" field="Bollinger_Upper" size="4" type="Int32" />
+                    <FormulaField expression="[MA_20]-[STD_MA20]" field="Bollinger_Lower" size="4" type="Int32" />
+                  </FormulaFields>
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText><![CDATA[Bollinger Bands
+]]></AnnotationText>
+                  <DefaultAnnotationText>STD_MA20 = SQRT([Var 20])
+Bollinger_Upper = [MA_20]+[STD_MA20]
+Bollinger_Lower =...</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFormula" />
+            </Node>
+            <Node ToolID="13">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+                <Position x="906" y="522" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <OrderChanged value="False" />
+                  <CommaDecimal value="False" />
+                  <SelectFields>
+                    <SelectField field="Var 20" selected="False" />
+                    <SelectField field="STD_MA20" selected="False" />
+                    <SelectField field="*Unknown" selected="True" />
+                  </SelectFields>
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <DefaultAnnotationText>Ausblenden Var20 und STDMA20</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+            </Node>
+          </ChildNodes>
+        </Node>
+        <Node ToolID="20">
+          <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+            <Position x="569" y="241" width="493" height="177" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Caption>Kalkulation SMA's</Caption>
+              <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+              <Disabled value="False" />
+              <Folded value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <ChildNodes>
+            <Node ToolID="15">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="690" y="318" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>File_Date</UpdateField_Name>
+                  <CreateField_Name>MA_14</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="14" />
+                  <Expression>Average([Row-14:Belegte Plätze],[Row-13:Belegte Plätze],[Row-12:Belegte Plätze],[Row-11:Belegte Plätze],[Row-10:Belegte Plätze],[Row-9:Belegte Plätze],[Row-8:Belegte Plätze],[Row-7:Belegte Plätze],[Row-6:Belegte Plätze],[Row-5:Belegte Plätze],[Row-4:Belegte Plätze],[Row-3:Belegte Plätze],[Row-2:Belegte Plätze],[Row-1:Belegte Plätze])</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>MA_14</AnnotationText>
+                  <DefaultAnnotationText>MA_14</DefaultAnnotationText>
+                  <Left value="True" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="16">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="786" y="318" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>MA_30</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="30" />
+                  <Expression>Average([Row-30:Belegte Plätze], [Row-29:Belegte Plätze], [Row-28:Belegte Plätze], [Row-27:Belegte Plätze], [Row-26:Belegte Plätze], [Row-25:Belegte Plätze], [Row-24:Belegte Plätze], [Row-23:Belegte Plätze], [Row-22:Belegte Plätze], [Row-21:Belegte Plätze], [Row-20:Belegte Plätze],  [Row-19:Belegte Plätze], [Row-18:Belegte Plätze], [Row-17:Belegte Plätze], [Row-16:Belegte Plätze], [Row-15:Belegte Plätze], [Row-14:Belegte Plätze], [Row-13:Belegte Plätze], [Row-12:Belegte Plätze], [Row-11:Belegte Plätze], [Row-10:Belegte Plätze], [Row-9:Belegte Plätze], [Row-8:Belegte Plätze], [Row-7:Belegte Plätze], [Row-6:Belegte Plätze], [Row-5:Belegte Plätze], [Row-4:Belegte Plätze], [Row-3:Belegte Plätze], [Row-2:Belegte Plätze], [Row-1:Belegte Plätze])</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>MA 30</AnnotationText>
+                  <DefaultAnnotationText>Average([Row-30:Belegte Plätze], [Row-29:Belegte Plätze], [Ro...</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="17">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="882" y="306" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>MA_200</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="200" />
+                  <Expression>Average(
+[Row-200:Belegte Plätze],
+[Row-199:Belegte Plätze],
+[Row-198:Belegte Plätze],
+[Row-197:Belegte Plätze],
+[Row-196:Belegte Plätze],
+[Row-195:Belegte Plätze],
+[Row-194:Belegte Plätze],
+[Row-193:Belegte Plätze],
+[Row-192:Belegte Plätze],
+[Row-191:Belegte Plätze],
+[Row-190:Belegte Plätze],
+[Row-189:Belegte Plätze],
+[Row-188:Belegte Plätze],
+[Row-187:Belegte Plätze],
+[Row-186:Belegte Plätze],
+[Row-185:Belegte Plätze],
+[Row-184:Belegte Plätze],
+[Row-183:Belegte Plätze],
+[Row-182:Belegte Plätze],
+[Row-181:Belegte Plätze],
+[Row-180:Belegte Plätze],
+[Row-179:Belegte Plätze],
+[Row-178:Belegte Plätze],
+[Row-177:Belegte Plätze],
+[Row-176:Belegte Plätze],
+[Row-175:Belegte Plätze],
+[Row-174:Belegte Plätze],
+[Row-173:Belegte Plätze],
+[Row-172:Belegte Plätze],
+[Row-171:Belegte Plätze],
+[Row-170:Belegte Plätze],
+[Row-169:Belegte Plätze],
+[Row-168:Belegte Plätze],
+[Row-167:Belegte Plätze],
+[Row-166:Belegte Plätze],
+[Row-165:Belegte Plätze],
+[Row-164:Belegte Plätze],
+[Row-163:Belegte Plätze],
+[Row-162:Belegte Plätze],
+[Row-161:Belegte Plätze],
+[Row-160:Belegte Plätze],
+[Row-159:Belegte Plätze],
+[Row-158:Belegte Plätze],
+[Row-157:Belegte Plätze],
+[Row-156:Belegte Plätze],
+[Row-155:Belegte Plätze],
+[Row-154:Belegte Plätze],
+[Row-153:Belegte Plätze],
+[Row-152:Belegte Plätze],
+[Row-151:Belegte Plätze],
+[Row-150:Belegte Plätze],
+[Row-149:Belegte Plätze],
+[Row-148:Belegte Plätze],
+[Row-147:Belegte Plätze],
+[Row-146:Belegte Plätze],
+[Row-145:Belegte Plätze],
+[Row-144:Belegte Plätze],
+[Row-143:Belegte Plätze],
+[Row-142:Belegte Plätze],
+[Row-141:Belegte Plätze],
+[Row-140:Belegte Plätze],
+[Row-139:Belegte Plätze],
+[Row-138:Belegte Plätze],
+[Row-137:Belegte Plätze],
+[Row-136:Belegte Plätze],
+[Row-135:Belegte Plätze],
+[Row-134:Belegte Plätze],
+[Row-133:Belegte Plätze],
+[Row-132:Belegte Plätze],
+[Row-131:Belegte Plätze],
+[Row-130:Belegte Plätze],
+[Row-129:Belegte Plätze],
+[Row-128:Belegte Plätze],
+[Row-127:Belegte Plätze],
+[Row-126:Belegte Plätze],
+[Row-125:Belegte Plätze],
+[Row-124:Belegte Plätze],
+[Row-123:Belegte Plätze],
+[Row-122:Belegte Plätze],
+[Row-121:Belegte Plätze],
+[Row-120:Belegte Plätze],
+[Row-119:Belegte Plätze],
+[Row-118:Belegte Plätze],
+[Row-117:Belegte Plätze],
+[Row-116:Belegte Plätze],
+[Row-115:Belegte Plätze],
+[Row-114:Belegte Plätze],
+[Row-113:Belegte Plätze],
+[Row-112:Belegte Plätze],
+[Row-111:Belegte Plätze],
+[Row-110:Belegte Plätze],
+[Row-109:Belegte Plätze],
+[Row-108:Belegte Plätze],
+[Row-107:Belegte Plätze],
+[Row-106:Belegte Plätze],
+[Row-105:Belegte Plätze],
+[Row-104:Belegte Plätze],
+[Row-103:Belegte Plätze],
+[Row-102:Belegte Plätze],
+[Row-101:Belegte Plätze],
+[Row-100:Belegte Plätze],
+[Row-99:Belegte Plätze],
+[Row-98:Belegte Plätze],
+[Row-97:Belegte Plätze],
+[Row-96:Belegte Plätze],
+[Row-95:Belegte Plätze],
+[Row-94:Belegte Plätze],
+[Row-93:Belegte Plätze],
+[Row-92:Belegte Plätze],
+[Row-91:Belegte Plätze],
+[Row-90:Belegte Plätze],
+[Row-89:Belegte Plätze],
+[Row-88:Belegte Plätze],
+[Row-87:Belegte Plätze],
+[Row-86:Belegte Plätze],
+[Row-85:Belegte Plätze],
+[Row-84:Belegte Plätze],
+[Row-83:Belegte Plätze],
+[Row-82:Belegte Plätze],
+[Row-81:Belegte Plätze],
+[Row-80:Belegte Plätze],
+[Row-79:Belegte Plätze],
+[Row-78:Belegte Plätze],
+[Row-77:Belegte Plätze],
+[Row-76:Belegte Plätze],
+[Row-75:Belegte Plätze],
+[Row-74:Belegte Plätze],
+[Row-73:Belegte Plätze],
+[Row-72:Belegte Plätze],
+[Row-71:Belegte Plätze],
+[Row-70:Belegte Plätze],
+[Row-69:Belegte Plätze],
+[Row-68:Belegte Plätze],
+[Row-67:Belegte Plätze],
+[Row-66:Belegte Plätze],
+[Row-65:Belegte Plätze],
+[Row-64:Belegte Plätze],
+[Row-63:Belegte Plätze],
+[Row-62:Belegte Plätze],
+[Row-61:Belegte Plätze],
+[Row-60:Belegte Plätze],
+[Row-59:Belegte Plätze],
+[Row-58:Belegte Plätze],
+[Row-57:Belegte Plätze],
+[Row-56:Belegte Plätze],
+[Row-55:Belegte Plätze],
+[Row-54:Belegte Plätze],
+[Row-53:Belegte Plätze],
+[Row-52:Belegte Plätze],
+[Row-51:Belegte Plätze],
+[Row-50:Belegte Plätze],
+[Row-49:Belegte Plätze],
+[Row-48:Belegte Plätze],
+[Row-47:Belegte Plätze],
+[Row-46:Belegte Plätze],
+[Row-45:Belegte Plätze],
+[Row-44:Belegte Plätze],
+[Row-43:Belegte Plätze],
+[Row-42:Belegte Plätze],
+[Row-41:Belegte Plätze],
+[Row-40:Belegte Plätze],
+[Row-39:Belegte Plätze],
+[Row-38:Belegte Plätze],
+[Row-37:Belegte Plätze],
+[Row-36:Belegte Plätze],
+[Row-35:Belegte Plätze],
+[Row-34:Belegte Plätze],
+[Row-33:Belegte Plätze],
+[Row-32:Belegte Plätze],
+[Row-31:Belegte Plätze],
+[Row-30:Belegte Plätze],
+[Row-29:Belegte Plätze],
+[Row-28:Belegte Plätze],
+[Row-27:Belegte Plätze],
+[Row-26:Belegte Plätze],
+[Row-25:Belegte Plätze],
+[Row-24:Belegte Plätze],
+[Row-23:Belegte Plätze],
+[Row-22:Belegte Plätze],
+[Row-21:Belegte Plätze],
+[Row-20:Belegte Plätze],
+[Row-19:Belegte Plätze],
+[Row-18:Belegte Plätze],
+[Row-17:Belegte Plätze],
+[Row-16:Belegte Plätze],
+[Row-15:Belegte Plätze],
+[Row-14:Belegte Plätze],
+[Row-13:Belegte Plätze],
+[Row-12:Belegte Plätze],
+[Row-11:Belegte Plätze],
+[Row-10:Belegte Plätze],
+[Row-9:Belegte Plätze],
+[Row-8:Belegte Plätze],
+[Row-7:Belegte Plätze],
+[Row-6:Belegte Plätze],
+[Row-5:Belegte Plätze],
+[Row-4:Belegte Plätze],
+[Row-3:Belegte Plätze],
+[Row-2:Belegte Plätze],
+[Row-1:Belegte Plätze])</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>MA 200</AnnotationText>
+                  <DefaultAnnotationText>Average(
+[Row-200:Belegte Plätze],
+[Row-199:Belegte Plätze],
+...</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="18">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="978" y="318" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>MA_90</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="90" />
+                  <Expression>Average(
+[Row-90:Belegte Plätze],
+[Row-89:Belegte Plätze],
+[Row-88:Belegte Plätze],
+[Row-87:Belegte Plätze],
+[Row-86:Belegte Plätze],
+[Row-85:Belegte Plätze],
+[Row-84:Belegte Plätze],
+[Row-83:Belegte Plätze],
+[Row-82:Belegte Plätze],
+[Row-81:Belegte Plätze],
+[Row-80:Belegte Plätze],
+[Row-79:Belegte Plätze],
+[Row-78:Belegte Plätze],
+[Row-77:Belegte Plätze],
+[Row-76:Belegte Plätze],
+[Row-75:Belegte Plätze],
+[Row-74:Belegte Plätze],
+[Row-73:Belegte Plätze],
+[Row-72:Belegte Plätze],
+[Row-71:Belegte Plätze],
+[Row-70:Belegte Plätze],
+[Row-69:Belegte Plätze],
+[Row-68:Belegte Plätze],
+[Row-67:Belegte Plätze],
+[Row-66:Belegte Plätze],
+[Row-65:Belegte Plätze],
+[Row-64:Belegte Plätze],
+[Row-63:Belegte Plätze],
+[Row-62:Belegte Plätze],
+[Row-61:Belegte Plätze],
+[Row-60:Belegte Plätze],
+[Row-59:Belegte Plätze],
+[Row-58:Belegte Plätze],
+[Row-57:Belegte Plätze],
+[Row-56:Belegte Plätze],
+[Row-55:Belegte Plätze],
+[Row-54:Belegte Plätze],
+[Row-53:Belegte Plätze],
+[Row-52:Belegte Plätze],
+[Row-51:Belegte Plätze],
+[Row-50:Belegte Plätze],
+[Row-49:Belegte Plätze],
+[Row-48:Belegte Plätze],
+[Row-47:Belegte Plätze],
+[Row-46:Belegte Plätze],
+[Row-45:Belegte Plätze],
+[Row-44:Belegte Plätze],
+[Row-43:Belegte Plätze],
+[Row-42:Belegte Plätze],
+[Row-41:Belegte Plätze],
+[Row-40:Belegte Plätze],
+[Row-39:Belegte Plätze],
+[Row-38:Belegte Plätze],
+[Row-37:Belegte Plätze],
+[Row-36:Belegte Plätze],
+[Row-35:Belegte Plätze],
+[Row-34:Belegte Plätze],
+[Row-33:Belegte Plätze],
+[Row-32:Belegte Plätze],
+[Row-31:Belegte Plätze],
+[Row-30:Belegte Plätze],
+[Row-29:Belegte Plätze],
+[Row-28:Belegte Plätze],
+[Row-27:Belegte Plätze],
+[Row-26:Belegte Plätze],
+[Row-25:Belegte Plätze],
+[Row-24:Belegte Plätze],
+[Row-23:Belegte Plätze],
+[Row-22:Belegte Plätze],
+[Row-21:Belegte Plätze],
+[Row-20:Belegte Plätze],
+[Row-19:Belegte Plätze],
+[Row-18:Belegte Plätze],
+[Row-17:Belegte Plätze],
+[Row-16:Belegte Plätze],
+[Row-15:Belegte Plätze],
+[Row-14:Belegte Plätze],
+[Row-13:Belegte Plätze],
+[Row-12:Belegte Plätze],
+[Row-11:Belegte Plätze],
+[Row-10:Belegte Plätze],
+[Row-9:Belegte Plätze],
+[Row-8:Belegte Plätze],
+[Row-7:Belegte Plätze],
+[Row-6:Belegte Plätze],
+[Row-5:Belegte Plätze],
+[Row-4:Belegte Plätze],
+[Row-3:Belegte Plätze],
+[Row-2:Belegte Plätze],
+[Row-1:Belegte Plätze])</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>MA 90</AnnotationText>
+                  <DefaultAnnotationText>Average(
+[Row-90:Belegte Plätze],
+[Row-89:Belegte Plätze],
+[R...</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="19">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="594" y="306" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>File_Date</UpdateField_Name>
+                  <CreateField_Name>MA_7</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="7" />
+                  <Expression>Average([Row-7:Belegte Plätze],[Row-6:Belegte Plätze],[Row-5:Belegte Plätze],[Row-4:Belegte Plätze],[Row-3:Belegte Plätze],[Row-2:Belegte Plätze],[Row-1:Belegte Plätze])</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <AnnotationText>MA_7</AnnotationText>
+                  <DefaultAnnotationText>MA_7</DefaultAnnotationText>
+                  <Left value="True" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+          </ChildNodes>
+        </Node>
+        <Node ToolID="24">
+          <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+            <Position x="149" y="473" width="317" height="149" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Caption>Kalkulation WMA</Caption>
+              <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+              <Disabled value="False" />
+              <Folded value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <ChildNodes>
+            <Node ToolID="21">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="174" y="522" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>Weighted_MA200</CreateField_Name>
+                  <CreateField_Type>Int64</CreateField_Type>
+                  <CreateField_Size>8</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="200" />
+                  <Expression>(([Row-200:Belegte Plätze]*1)+
+([Row-199:Belegte Plätze]*2)+
+([Row-198:Belegte Plätze]*3)+
+([Row-197:Belegte Plätze]*4)+
+([Row-196:Belegte Plätze]*5)+
+([Row-195:Belegte Plätze]*6)+
+([Row-194:Belegte Plätze]*7)+
+([Row-193:Belegte Plätze]*8)+
+([Row-192:Belegte Plätze]*9)+
+([Row-191:Belegte Plätze]*10)+
+([Row-190:Belegte Plätze]*11)+
+([Row-189:Belegte Plätze]*12)+
+([Row-188:Belegte Plätze]*13)+
+([Row-187:Belegte Plätze]*14)+
+([Row-186:Belegte Plätze]*15)+
+([Row-185:Belegte Plätze]*16)+
+([Row-184:Belegte Plätze]*17)+
+([Row-183:Belegte Plätze]*18)+
+([Row-182:Belegte Plätze]*19)+
+([Row-181:Belegte Plätze]*20)+
+([Row-180:Belegte Plätze]*21)+
+([Row-179:Belegte Plätze]*22)+
+([Row-178:Belegte Plätze]*23)+
+([Row-177:Belegte Plätze]*24)+
+([Row-176:Belegte Plätze]*25)+
+([Row-175:Belegte Plätze]*26)+
+([Row-174:Belegte Plätze]*27)+
+([Row-173:Belegte Plätze]*28)+
+([Row-172:Belegte Plätze]*29)+
+([Row-171:Belegte Plätze]*30)+
+([Row-170:Belegte Plätze]*31)+
+([Row-169:Belegte Plätze]*32)+
+([Row-168:Belegte Plätze]*33)+
+([Row-167:Belegte Plätze]*34)+
+([Row-166:Belegte Plätze]*35)+
+([Row-165:Belegte Plätze]*36)+
+([Row-164:Belegte Plätze]*37)+
+([Row-163:Belegte Plätze]*38)+
+([Row-162:Belegte Plätze]*39)+
+([Row-161:Belegte Plätze]*40)+
+([Row-160:Belegte Plätze]*41)+
+([Row-159:Belegte Plätze]*42)+
+([Row-158:Belegte Plätze]*43)+
+([Row-157:Belegte Plätze]*44)+
+([Row-156:Belegte Plätze]*45)+
+([Row-155:Belegte Plätze]*46)+
+([Row-154:Belegte Plätze]*47)+
+([Row-153:Belegte Plätze]*48)+
+([Row-152:Belegte Plätze]*49)+
+([Row-151:Belegte Plätze]*50)+
+([Row-150:Belegte Plätze]*51)+
+([Row-149:Belegte Plätze]*52)+
+([Row-148:Belegte Plätze]*53)+
+([Row-147:Belegte Plätze]*54)+
+([Row-146:Belegte Plätze]*55)+
+([Row-145:Belegte Plätze]*56)+
+([Row-144:Belegte Plätze]*57)+
+([Row-143:Belegte Plätze]*58)+
+([Row-142:Belegte Plätze]*59)+
+([Row-141:Belegte Plätze]*60)+
+([Row-140:Belegte Plätze]*61)+
+([Row-139:Belegte Plätze]*62)+
+([Row-138:Belegte Plätze]*63)+
+([Row-137:Belegte Plätze]*64)+
+([Row-136:Belegte Plätze]*65)+
+([Row-135:Belegte Plätze]*66)+
+([Row-134:Belegte Plätze]*67)+
+([Row-133:Belegte Plätze]*68)+
+([Row-132:Belegte Plätze]*69)+
+([Row-131:Belegte Plätze]*70)+
+([Row-130:Belegte Plätze]*71)+
+([Row-129:Belegte Plätze]*72)+
+([Row-128:Belegte Plätze]*73)+
+([Row-127:Belegte Plätze]*74)+
+([Row-126:Belegte Plätze]*75)+
+([Row-125:Belegte Plätze]*76)+
+([Row-124:Belegte Plätze]*77)+
+([Row-123:Belegte Plätze]*78)+
+([Row-122:Belegte Plätze]*79)+
+([Row-121:Belegte Plätze]*80)+
+([Row-120:Belegte Plätze]*81)+
+([Row-119:Belegte Plätze]*82)+
+([Row-118:Belegte Plätze]*83)+
+([Row-117:Belegte Plätze]*84)+
+([Row-116:Belegte Plätze]*85)+
+([Row-115:Belegte Plätze]*86)+
+([Row-114:Belegte Plätze]*87)+
+([Row-113:Belegte Plätze]*88)+
+([Row-112:Belegte Plätze]*89)+
+([Row-111:Belegte Plätze]*90)+
+([Row-110:Belegte Plätze]*91)+
+([Row-109:Belegte Plätze]*92)+
+([Row-108:Belegte Plätze]*93)+
+([Row-107:Belegte Plätze]*94)+
+([Row-106:Belegte Plätze]*95)+
+([Row-105:Belegte Plätze]*96)+
+([Row-104:Belegte Plätze]*97)+
+([Row-103:Belegte Plätze]*98)+
+([Row-102:Belegte Plätze]*99)+
+([Row-101:Belegte Plätze]*100)+
+([Row-100:Belegte Plätze]*101)+
+([Row-99:Belegte Plätze]*102)+
+([Row-98:Belegte Plätze]*103)+
+([Row-97:Belegte Plätze]*104)+
+([Row-96:Belegte Plätze]*105)+
+([Row-95:Belegte Plätze]*106)+
+([Row-94:Belegte Plätze]*107)+
+([Row-93:Belegte Plätze]*108)+
+([Row-92:Belegte Plätze]*109)+
+([Row-91:Belegte Plätze]*110)+
+([Row-90:Belegte Plätze]*111)+
+([Row-89:Belegte Plätze]*112)+
+([Row-88:Belegte Plätze]*113)+
+([Row-87:Belegte Plätze]*114)+
+([Row-86:Belegte Plätze]*115)+
+([Row-85:Belegte Plätze]*116)+
+([Row-84:Belegte Plätze]*117)+
+([Row-83:Belegte Plätze]*118)+
+([Row-82:Belegte Plätze]*119)+
+([Row-81:Belegte Plätze]*120)+
+([Row-80:Belegte Plätze]*121)+
+([Row-79:Belegte Plätze]*122)+
+([Row-78:Belegte Plätze]*123)+
+([Row-77:Belegte Plätze]*124)+
+([Row-76:Belegte Plätze]*125)+
+([Row-75:Belegte Plätze]*126)+
+([Row-74:Belegte Plätze]*127)+
+([Row-73:Belegte Plätze]*128)+
+([Row-72:Belegte Plätze]*129)+
+([Row-71:Belegte Plätze]*130)+
+([Row-70:Belegte Plätze]*131)+
+([Row-69:Belegte Plätze]*132)+
+([Row-68:Belegte Plätze]*133)+
+([Row-67:Belegte Plätze]*134)+
+([Row-66:Belegte Plätze]*135)+
+([Row-65:Belegte Plätze]*136)+
+([Row-64:Belegte Plätze]*137)+
+([Row-63:Belegte Plätze]*138)+
+([Row-62:Belegte Plätze]*139)+
+([Row-61:Belegte Plätze]*140)+
+([Row-60:Belegte Plätze]*141)+
+([Row-59:Belegte Plätze]*142)+
+([Row-58:Belegte Plätze]*143)+
+([Row-57:Belegte Plätze]*144)+
+([Row-56:Belegte Plätze]*145)+
+([Row-55:Belegte Plätze]*146)+
+([Row-54:Belegte Plätze]*147)+
+([Row-53:Belegte Plätze]*148)+
+([Row-52:Belegte Plätze]*149)+
+([Row-51:Belegte Plätze]*150)+
+([Row-50:Belegte Plätze]*151)+
+([Row-49:Belegte Plätze]*152)+
+([Row-48:Belegte Plätze]*153)+
+([Row-47:Belegte Plätze]*154)+
+([Row-46:Belegte Plätze]*155)+
+([Row-45:Belegte Plätze]*156)+
+([Row-44:Belegte Plätze]*157)+
+([Row-43:Belegte Plätze]*158)+
+([Row-42:Belegte Plätze]*159)+
+([Row-41:Belegte Plätze]*160)+
+([Row-40:Belegte Plätze]*161)+
+([Row-39:Belegte Plätze]*162)+
+([Row-38:Belegte Plätze]*163)+
+([Row-37:Belegte Plätze]*164)+
+([Row-36:Belegte Plätze]*165)+
+([Row-35:Belegte Plätze]*166)+
+([Row-34:Belegte Plätze]*167)+
+([Row-33:Belegte Plätze]*168)+
+([Row-32:Belegte Plätze]*169)+
+([Row-31:Belegte Plätze]*170)+
+([Row-30:Belegte Plätze]*171)+
+([Row-29:Belegte Plätze]*172)+
+([Row-28:Belegte Plätze]*173)+
+([Row-27:Belegte Plätze]*174)+
+([Row-26:Belegte Plätze]*175)+
+([Row-25:Belegte Plätze]*176)+
+([Row-24:Belegte Plätze]*177)+
+([Row-23:Belegte Plätze]*178)+
+([Row-22:Belegte Plätze]*179)+
+([Row-21:Belegte Plätze]*180)+
+([Row-20:Belegte Plätze]*181)+
+([Row-19:Belegte Plätze]*182)+
+([Row-18:Belegte Plätze]*183)+
+([Row-17:Belegte Plätze]*184)+
+([Row-16:Belegte Plätze]*185)+
+([Row-15:Belegte Plätze]*186)+
+([Row-14:Belegte Plätze]*187)+
+([Row-13:Belegte Plätze]*188)+
+([Row-12:Belegte Plätze]*189)+
+([Row-11:Belegte Plätze]*190)+
+([Row-10:Belegte Plätze]*191)+
+([Row-9:Belegte Plätze]*192)+
+([Row-8:Belegte Plätze]*193)+
+([Row-7:Belegte Plätze]*194)+
+([Row-6:Belegte Plätze]*195)+
+([Row-5:Belegte Plätze]*196)+
+([Row-4:Belegte Plätze]*197)+
+([Row-3:Belegte Plätze]*198)+
+([Row-2:Belegte Plätze]*199)+
+([Row-1:Belegte Plätze]*200))/20100</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <DefaultAnnotationText>Weighted_MA200</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="22">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="258" y="522" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name>Anzahl Stellplätze</UpdateField_Name>
+                  <CreateField_Name>Weighted_MA90</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="90" />
+                  <Expression>(([Row-90:Belegte Plätze]*111)+
+([Row-89:Belegte Plätze]*112)+
+([Row-88:Belegte Plätze]*113)+
+([Row-87:Belegte Plätze]*114)+
+([Row-86:Belegte Plätze]*115)+
+([Row-85:Belegte Plätze]*116)+
+([Row-84:Belegte Plätze]*117)+
+([Row-83:Belegte Plätze]*118)+
+([Row-82:Belegte Plätze]*119)+
+([Row-81:Belegte Plätze]*120)+
+([Row-80:Belegte Plätze]*121)+
+([Row-79:Belegte Plätze]*122)+
+([Row-78:Belegte Plätze]*123)+
+([Row-77:Belegte Plätze]*124)+
+([Row-76:Belegte Plätze]*125)+
+([Row-75:Belegte Plätze]*126)+
+([Row-74:Belegte Plätze]*127)+
+([Row-73:Belegte Plätze]*128)+
+([Row-72:Belegte Plätze]*129)+
+([Row-71:Belegte Plätze]*130)+
+([Row-70:Belegte Plätze]*131)+
+([Row-69:Belegte Plätze]*132)+
+([Row-68:Belegte Plätze]*133)+
+([Row-67:Belegte Plätze]*134)+
+([Row-66:Belegte Plätze]*135)+
+([Row-65:Belegte Plätze]*136)+
+([Row-64:Belegte Plätze]*137)+
+([Row-63:Belegte Plätze]*138)+
+([Row-62:Belegte Plätze]*139)+
+([Row-61:Belegte Plätze]*140)+
+([Row-60:Belegte Plätze]*141)+
+([Row-59:Belegte Plätze]*142)+
+([Row-58:Belegte Plätze]*143)+
+([Row-57:Belegte Plätze]*144)+
+([Row-56:Belegte Plätze]*145)+
+([Row-55:Belegte Plätze]*146)+
+([Row-54:Belegte Plätze]*147)+
+([Row-53:Belegte Plätze]*148)+
+([Row-52:Belegte Plätze]*149)+
+([Row-51:Belegte Plätze]*150)+
+([Row-50:Belegte Plätze]*151)+
+([Row-49:Belegte Plätze]*152)+
+([Row-48:Belegte Plätze]*153)+
+([Row-47:Belegte Plätze]*154)+
+([Row-46:Belegte Plätze]*155)+
+([Row-45:Belegte Plätze]*156)+
+([Row-44:Belegte Plätze]*157)+
+([Row-43:Belegte Plätze]*158)+
+([Row-42:Belegte Plätze]*159)+
+([Row-41:Belegte Plätze]*160)+
+([Row-40:Belegte Plätze]*161)+
+([Row-39:Belegte Plätze]*162)+
+([Row-38:Belegte Plätze]*163)+
+([Row-37:Belegte Plätze]*164)+
+([Row-36:Belegte Plätze]*165)+
+([Row-35:Belegte Plätze]*166)+
+([Row-34:Belegte Plätze]*167)+
+([Row-33:Belegte Plätze]*168)+
+([Row-32:Belegte Plätze]*169)+
+([Row-31:Belegte Plätze]*170)+
+([Row-30:Belegte Plätze]*171)+
+([Row-29:Belegte Plätze]*172)+
+([Row-28:Belegte Plätze]*173)+
+([Row-27:Belegte Plätze]*174)+
+([Row-26:Belegte Plätze]*175)+
+([Row-25:Belegte Plätze]*176)+
+([Row-24:Belegte Plätze]*177)+
+([Row-23:Belegte Plätze]*178)+
+([Row-22:Belegte Plätze]*179)+
+([Row-21:Belegte Plätze]*180)+
+([Row-20:Belegte Plätze]*181)+
+([Row-19:Belegte Plätze]*182)+
+([Row-18:Belegte Plätze]*183)+
+([Row-17:Belegte Plätze]*184)+
+([Row-16:Belegte Plätze]*185)+
+([Row-15:Belegte Plätze]*186)+
+([Row-14:Belegte Plätze]*187)+
+([Row-13:Belegte Plätze]*188)+
+([Row-12:Belegte Plätze]*189)+
+([Row-11:Belegte Plätze]*190)+
+([Row-10:Belegte Plätze]*191)+
+([Row-9:Belegte Plätze]*192)+
+([Row-8:Belegte Plätze]*193)+
+([Row-7:Belegte Plätze]*194)+
+([Row-6:Belegte Plätze]*195)+
+([Row-5:Belegte Plätze]*196)+
+([Row-4:Belegte Plätze]*197)+
+([Row-3:Belegte Plätze]*198)+
+([Row-2:Belegte Plätze]*199)+
+([Row-1:Belegte Plätze]*200))/13995</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <DefaultAnnotationText>Weighted_MA90</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+            <Node ToolID="23">
+              <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+                <Position x="342" y="522" />
+              </GuiSettings>
+              <Properties>
+                <Configuration>
+                  <UpdateField value="False" />
+                  <UpdateField_Name />
+                  <CreateField_Name>Weighted_MA30</CreateField_Name>
+                  <CreateField_Type>Int32</CreateField_Type>
+                  <CreateField_Size>4</CreateField_Size>
+                  <OtherRows>Empty</OtherRows>
+                  <NumRows value="30" />
+                  <Expression>(([Row-30:Belegte Plätze]*171)+
+([Row-29:Belegte Plätze]*172)+
+([Row-28:Belegte Plätze]*173)+
+([Row-27:Belegte Plätze]*174)+
+([Row-26:Belegte Plätze]*175)+
+([Row-25:Belegte Plätze]*176)+
+([Row-24:Belegte Plätze]*177)+
+([Row-23:Belegte Plätze]*178)+
+([Row-22:Belegte Plätze]*179)+
+([Row-21:Belegte Plätze]*180)+
+([Row-20:Belegte Plätze]*181)+
+([Row-19:Belegte Plätze]*182)+
+([Row-18:Belegte Plätze]*183)+
+([Row-17:Belegte Plätze]*184)+
+([Row-16:Belegte Plätze]*185)+
+([Row-15:Belegte Plätze]*186)+
+([Row-14:Belegte Plätze]*187)+
+([Row-13:Belegte Plätze]*188)+
+([Row-12:Belegte Plätze]*189)+
+([Row-11:Belegte Plätze]*190)+
+([Row-10:Belegte Plätze]*191)+
+([Row-9:Belegte Plätze]*192)+
+([Row-8:Belegte Plätze]*193)+
+([Row-7:Belegte Plätze]*194)+
+([Row-6:Belegte Plätze]*195)+
+([Row-5:Belegte Plätze]*196)+
+([Row-4:Belegte Plätze]*197)+
+([Row-3:Belegte Plätze]*198)+
+([Row-2:Belegte Plätze]*199)+
+([Row-1:Belegte Plätze]*200))/5565</Expression>
+                  <GroupByFields />
+                </Configuration>
+                <Annotation DisplayMode="0">
+                  <Name />
+                  <DefaultAnnotationText>Weighted_MA30</DefaultAnnotationText>
+                  <Left value="False" />
+                </Annotation>
+              </Properties>
+              <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+            </Node>
+          </ChildNodes>
+        </Node>
+        <Node ToolID="25">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Formula.Formula">
+            <Position x="1074" y="330" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <FormulaFields>
+                <FormulaField expression="[MA_200]-[MA_90]" field="Diff_MA200-MA90" size="4" type="Int32" />
+                <FormulaField expression="[MA_200]-[MA_30]" field="Diff_MA200-MA30" size="4" type="Int32" />
+                <FormulaField expression="[MA_200]-[MA_14]" field="Diff_MA200-MA14" size="4" type="Int32" />
+                <FormulaField expression="[MA_200]-[MA_7]" field="Diff_MA200-MA7" size="4" type="Int32" />
+                <FormulaField expression="[MA_200]-[Belegte Plätze]" field="Diff_MA200-Target" size="4" type="Int32" />
+              </FormulaFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <AnnotationText>Differenzen der SMA's</AnnotationText>
+              <DefaultAnnotationText>Differenzen der SMA's</DefaultAnnotationText>
+              <Left value="True" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxFormula" />
+        </Node>
+        <Node ToolID="26">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.MultiRowFormula.MultiRowFormula">
+            <Position x="462" y="305" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <UpdateField value="False" />
+              <UpdateField_Name>File_Date</UpdateField_Name>
+              <CreateField_Name>Diff_Taget-Lag1</CreateField_Name>
+              <CreateField_Type>Int32</CreateField_Type>
+              <CreateField_Size>4</CreateField_Size>
+              <OtherRows>Empty</OtherRows>
+              <NumRows value="1" />
+              <Expression>[Belegte Plätze]-[Row-1:Belegte Plätze]</Expression>
+              <GroupByFields />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <AnnotationText>Differenz Target-Target_Lag-1</AnnotationText>
+              <DefaultAnnotationText>Differenz Target-Target_Lag-1</DefaultAnnotationText>
+              <Left value="True" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxMultiRowFormula" />
+        </Node>
+        <Node ToolID="27">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.DbFileInput.DbFileInput">
+            <Position x="150" y="654" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Passwords />
+              <File OutputFileName="" RecordLimit="" SearchSubDirs="False" FileFormat="25">C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`</File>
+              <FormatSpecificOptions>
+                <FirstRowData>False</FirstRowData>
+                <ImportLine>1</ImportLine>
+              </FormatSpecificOptions>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Dim_Date_2019-2021.xlsx
+Query=`Dim_Date_2019-2021$`</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output">
+              <RecordInfo>
+                <Field name="Dateid" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="Date" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Date" />
+                <Field name="DateString" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Date" />
+                <Field name="Day" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="DayofYear" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="DayofWeek" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="DayofWeekName" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="Week" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="WeekKey" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="Month" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="MonthName" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="MonthKey" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="Quarter" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="QuarterName" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="QuarterKey" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="Year" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="IsWeekend" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="IsLeapYear" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="BKT" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="MonthYearKey" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="BKT_Year" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="WorkingDay" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+                <Field name="BKT_Day" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="DayofWeekName_DEU" size="255" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="V_String" />
+                <Field name="DayofWeek_DEU" source="File: C:\Users\woelk\OneDrive\Dokumente\Studium - HdM Stuttgart\Advanced Business Analytics Models\Prüfungsprojekt\Datensätze\Dim_Date_2019-2021.xlsx|||`Dim_Date_2019-2021$`" type="Double" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxDbFileInput" />
+        </Node>
+        <Node ToolID="28">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Join.Join">
+            <Position x="306" y="654" />
+          </GuiSettings>
+          <Properties>
+            <Configuration joinByRecordPos="False">
+              <JoinInfo connection="Left">
+                <Field field="File_Date" />
+              </JoinInfo>
+              <JoinInfo connection="Right">
+                <Field field="Date" />
+              </JoinInfo>
+              <SelectConfiguration>
+                <Configuration outputConnection="Join">
+                  <OrderChanged value="False" />
+                  <CommaDecimal value="False" />
+                  <SelectFields>
+                    <SelectField field="*Unknown" selected="True" />
+                  </SelectFields>
+                </Configuration>
+              </SelectConfiguration>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxJoin" />
+        </Node>
+        <Node ToolID="29">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.Union.Union">
+            <Position x="402" y="642" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ByName_ErrorMode>Warning</ByName_ErrorMode>
+              <ByName_OutputMode>All</ByName_OutputMode>
+              <Mode>ByName</Mode>
+              <SetOutputOrder value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnion" />
+        </Node>
+        <Node ToolID="30">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="498" y="642" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="61">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="1649" y="209" width="769" height="469" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Zeitreihenanalyse (Plots)</Caption>
+          <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+          <Caption>Zeitreihenanalyse (Plots)</Caption>
+          <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="True" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="32">
+          <GuiSettings>
+            <Position x="1686" y="341" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">Belegte Plätze</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="33">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1794" y="293" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Anzeige Zeitreihendiagramm</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="34">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1794" y="353" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Anzeige Zeitreihenanalyse - Autokorrelation, Trend etc.</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="35">
+          <GuiSettings Plugin="PlotlyCharting">
+            <Position x="1674" y="473" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ChartingFields>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Belegte Plätze</ysrc>
+                  <name>Belegte Plätze</name>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <xsrc>File_Date</xsrc>
+                  <name>Gleitender Mittelwert (7T)</name>
+                  <ysrc>MA_7</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <xsrc>File_Date</xsrc>
+                  <orientation>v</orientation>
+                  <name>Gleitender Mittelwert (30 T)</name>
+                  <ysrc>MA_30</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Gleitender Mittelwert (200T)</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>MA_200</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Gleitender Mittelwert (90T)</name>
+                  <xsrc>File_Date</xsrc>
+                  <yaxis>y2</yaxis>
+                  <ysrc>MA_90</ysrc>
+                </Traces>
+                <Layout>
+                  <title>
+                    <text>
+                    </text>
+                  </title>
+                  <font>
+                    <family>sans-serif</family>
+                  </font>
+                  <autosize>false</autosize>
+                  <width>700</width>
+                  <height>849</height>
+                  <showlegend>true</showlegend>
+                  <hovermode>closest</hovermode>
+                  <xaxis>
+                    <range>2019-01-01</range>
+                    <range>2021-10-04</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>File_Date</text>
+                    </title>
+                    <type>date</type>
+                  </xaxis>
+                  <yaxis>
+                    <showgrid>false</showgrid>
+                    <range>142677.83333333334</range>
+                    <range>212901.16666666666</range>
+                    <autorange>true</autorange>
+                    <type>linear</type>
+                  </yaxis>
+                  <yaxis2>
+                    <side>right</side>
+                    <showgrid>false</showgrid>
+                    <overlaying>y</overlaying>
+                    <type>linear</type>
+                    <range>156088.94444444444</range>
+                    <range>203410.05555555556</range>
+                    <autorange>true</autorange>
+                  </yaxis2>
+                  <legend>
+                    <x>1.1210388377142153</x>
+                    <y>1</y>
+                  </legend>
+                </Layout>
+              </ChartingFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="PortfolioPluginsEngine.dll" EngineDllEntryPoint="ComposerInteractiveCharting" />
+        </Node>
+        <Node ToolID="36">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1842" y="486" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>Anzeige der Diagramme</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="37">
+          <GuiSettings Plugin="PlotlyCharting">
+            <Position x="1686" y="414" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ChartingFields>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Füllgrad in %</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Füllgrad</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Freie Plätze</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Freie Plätze</ysrc>
+                  <yaxis>y2</yaxis>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Belegte Plätze</ysrc>
+                  <yaxis>y2</yaxis>
+                  <name>Belegte Plätze</name>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Anzahl verfügbarer Stellplätze im Lager</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Anzahl Stellplätze</ysrc>
+                  <yaxis>y2</yaxis>
+                </Traces>
+                <Layout>
+                  <title>
+                    <text>
+                    </text>
+                  </title>
+                  <font>
+                    <family>sans-serif</family>
+                  </font>
+                  <autosize>false</autosize>
+                  <width>700</width>
+                  <height>849</height>
+                  <showlegend>true</showlegend>
+                  <hovermode>closest</hovermode>
+                  <xaxis>
+                    <range>2019-01-01</range>
+                    <range>2021-10-04</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>File_Date</text>
+                    </title>
+                    <type>date</type>
+                  </xaxis>
+                  <yaxis>
+                    <range>60.983333333333334</range>
+                    <range>88.316666666666663</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>Füllgrad</text>
+                    </title>
+                    <type>linear</type>
+                  </yaxis>
+                  <yaxis2>
+                    <side>right</side>
+                    <showgrid>false</showgrid>
+                    <overlaying>y</overlaying>
+                    <type>linear</type>
+                    <range>12638.722222222219</range>
+                    <range>273084.27777777775</range>
+                    <autorange>true</autorange>
+                  </yaxis2>
+                </Layout>
+              </ChartingFields>
+            </Configuration>
+            <Annotation DisplayMode="2">
+              <Name />
+              <DefaultAnnotationText>Ziel: Finden der geeigneten Zielvariable (auf welche Variable ist eine Vorhersage zu machen?)
+
+--&gt; Belegte Plätze, da weniger anfällig für kapazitative Anpassungen (Lagererweiterungen, Sperrung von Lagergassen aus technischen Gründen etc.)</DefaultAnnotationText>
+              <Left value="True" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="PortfolioPluginsEngine.dll" EngineDllEntryPoint="ComposerInteractiveCharting" />
+        </Node>
+        <Node ToolID="38">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1794" y="426" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <Layout>
+                <View1>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="39">
+          <GuiSettings>
+            <Position x="1986" y="270" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">MA_7</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="40">
+          <GuiSettings>
+            <Position x="1986" y="330" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">MA_30</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="41">
+          <GuiSettings>
+            <Position x="1986" y="390" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">MA_200</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="42">
+          <GuiSettings>
+            <Position x="1986" y="438" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">MA_90</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="43">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2070" y="306" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="44">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2070" y="366" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="45">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2082" y="426" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="46">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2082" y="474" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Bericht</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="47">
+          <GuiSettings>
+            <Position x="1986" y="498" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">Weighted_MA200</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>ZR-Diagramm: Weighted MA 200</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="48">
+          <GuiSettings>
+            <Position x="1986" y="558" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">Weighted_MA90</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">True</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">False</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText>ZR-Diagramm: Weighted MA 90</DefaultAnnotationText>
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="49">
+          <GuiSettings>
+            <Position x="2226" y="258" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">Weighted_MA30</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">False</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">True</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="50">
+          <GuiSettings>
+            <Position x="2226" y="342" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">Bollinger_Upper</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">False</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">True</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="51">
+          <GuiSettings Plugin="PlotlyCharting">
+            <Position x="2226" y="474" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ChartingFields>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Belegte Plätze</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Belegte Plätze</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Weighted MA 200</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Weighted_MA200</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Weighted MA 90</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Weighted_MA90</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Weighted MA 30</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Weighted_MA30</ysrc>
+                </Traces>
+                <Layout>
+                  <title>
+                    <text>
+                    </text>
+                  </title>
+                  <font>
+                    <family>sans-serif</family>
+                  </font>
+                  <autosize>false</autosize>
+                  <width>700</width>
+                  <height>849</height>
+                  <showlegend>true</showlegend>
+                  <hovermode>closest</hovermode>
+                  <xaxis>
+                    <range>1546300800000</range>
+                    <range>1633305600000</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>File_Date</text>
+                    </title>
+                    <type>date</type>
+                  </xaxis>
+                  <yaxis>
+                    <range>149807.05555555556</range>
+                    <range>212525.94444444444</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>Belegte Plätze</text>
+                    </title>
+                    <type>linear</type>
+                  </yaxis>
+                </Layout>
+              </ChartingFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="PortfolioPluginsEngine.dll" EngineDllEntryPoint="ComposerInteractiveCharting" />
+        </Node>
+        <Node ToolID="52">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2334" y="498" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <Layout>
+                <View1>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="53">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2322" y="378" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <Layout>
+                <View1>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="54">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2322" y="294" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="55">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2082" y="594" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <Layout>
+                <View1>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="56">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2082" y="534" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="57">
+          <GuiSettings>
+            <Position x="2226" y="414" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="target_field">Bollinger_Lower</Value>
+              <Value name="freq_hourly">False</Value>
+              <Value name="freq_daily">False</Value>
+              <Value name="freq_weekdays">False</Value>
+              <Value name="freq_weekly">False</Value>
+              <Value name="freq_monthly">True</Value>
+              <Value name="freq_quarterly">False</Value>
+              <Value name="freq_annually">False</Value>
+              <Value name="freq_other">False</Value>
+              <Value name="series_start">False</Value>
+              <Value name="start_year">2012</Value>
+              <Value name="start_month_qtr">1</Value>
+              <Value name="ts_plot">True</Value>
+              <Value name="seas_plot">False</Value>
+              <Value name="seas_dev_plot">False</Value>
+              <Value name="acf_plot">False</Value>
+              <Value name="pacf_plot">False</Value>
+              <Value name="decomp_plot">False</Value>
+              <Value name="inches">True</Value>
+              <Value name="in.w">5.50</Value>
+              <Value name="in.h">5.50</Value>
+              <Value name="centimeters">False</Value>
+              <Value name="cm.w">13.00</Value>
+              <Value name="cm.h">14.95</Value>
+              <Value name="graph.resolution">1x</Value>
+              <Value name="pointsize">10</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="Predictive Tools\TS_Plot.yxmc" />
+        </Node>
+        <Node ToolID="58">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2322" y="450" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="59">
+          <GuiSettings Plugin="PlotlyCharting">
+            <Position x="2238" y="558" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <ChartingFields>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Belegte Plätze</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Belegte Plätze</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Bollinger Upper</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Bollinger_Upper</ysrc>
+                </Traces>
+                <Traces>
+                  <type>scatter</type>
+                  <mode>lines</mode>
+                  <name>Bollinger Lower</name>
+                  <xsrc>File_Date</xsrc>
+                  <ysrc>Bollinger_Lower</ysrc>
+                </Traces>
+                <Layout>
+                  <title>
+                    <text>
+                    </text>
+                  </title>
+                  <font>
+                    <family>sans-serif</family>
+                  </font>
+                  <autosize>false</autosize>
+                  <width>700</width>
+                  <height>849</height>
+                  <showlegend>true</showlegend>
+                  <hovermode>closest</hovermode>
+                  <xaxis>
+                    <range>2019-01-01</range>
+                    <range>2021-10-04</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>File_Date</text>
+                    </title>
+                    <type>date</type>
+                  </xaxis>
+                  <yaxis>
+                    <range>149807.05555555556</range>
+                    <range>212525.94444444444</range>
+                    <autorange>true</autorange>
+                    <title>
+                      <text>Belegte Plätze</text>
+                    </title>
+                    <type>linear</type>
+                  </yaxis>
+                </Layout>
+              </ChartingFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="PortfolioPluginsEngine.dll" EngineDllEntryPoint="ComposerInteractiveCharting" />
+        </Node>
+        <Node ToolID="60">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="2334" y="558" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="68">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="1661" y="809" width="409" height="193" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Korrelationsmatrizen</Caption>
+          <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+          <Caption>Korrelationsmatrizen</Caption>
+          <Style TextColor="#314c4a" FillColor="#ecf2f2" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="True" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="62">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.PearsonCorrelation.PearsonCorrelation">
+            <Position x="1686" y="858" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Fields orderChanged="False">
+                <Field name="Belegte Plätze" />
+                <Field name="Belegte Plätze_Lag-1" />
+                <Field name="MA_7" />
+                <Field name="MA_14" />
+                <Field name="MA_30" />
+                <Field name="MA_200" />
+                <Field name="MA_90" />
+                <Field name="Diff_MA200-MA90" />
+                <Field name="Diff_MA200-MA30" />
+                <Field name="Diff_MA200-MA14" />
+                <Field name="Diff_MA200-MA7" />
+                <Field name="Diff_MA200-Target" />
+                <Field name="Belegte Plätze_Lag-2" />
+                <Field name="Belegte Plätze_Lag-3" />
+                <Field name="Belegte Plätze_Lag-4" />
+                <Field name="Belegte Plätze_Lag-5" />
+                <Field name="Belegte Plätze_Lag-6" />
+                <Field name="Belegte Plätze_Lag-7" />
+                <Field name="Belegte Plätze_Lag-8" />
+                <Field name="Belegte Plätze_Lag-9" />
+                <Field name="Belegte Plätze_Lag-10" />
+                <Field name="Belegte Plätze_Lag-11" />
+                <Field name="Belegte Plätze_Lag-12" />
+                <Field name="Belegte Plätze_Lag-13" />
+                <Field name="Belegte Plätze_Lag-14" />
+                <Field name="Belegte Plätze_Lag-15" />
+                <Field name="Belegte Plätze_Lag-16" />
+                <Field name="Belegte Plätze_Lag-17" />
+                <Field name="Belegte Plätze_Lag-18" />
+                <Field name="Belegte Plätze_Lag-19" />
+                <Field name="Belegte Plätze_Lag-20" />
+                <Field name="Belegte Plätze_Lag-21" />
+                <Field name="Belegte Plätze_Lag-22" />
+                <Field name="Belegte Plätze_Lag-23" />
+                <Field name="Belegte Plätze_Lag-24" />
+                <Field name="Belegte Plätze_Lag-25" />
+                <Field name="Belegte Plätze_Lag-26" />
+                <Field name="Belegte Plätze_Lag-27" />
+                <Field name="Belegte Plätze_Lag-28" />
+                <Field name="Belegte Plätze_Lag-29" />
+                <Field name="Belegte Plätze_Lag-30" />
+                <Field name="Diff_Taget-Lag1" />
+                <Field name="Weighted_MA200" />
+                <Field name="Weighted_MA90" />
+                <Field name="Weighted_MA30" />
+                <Field name="MA_20" />
+                <Field name="Bollinger_Upper" />
+                <Field name="Bollinger_Lower" />
+                <Field name="*Unknown" />
+                <Field name="Anzahl Stellplätze" selected="False" />
+                <Field name="Freie Plätze" selected="False" />
+                <Field name="Füllgrad" selected="False" />
+              </Fields>
+              <Covariance value="False" />
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxPearsonCorrelation" />
+        </Node>
+        <Node ToolID="63">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1782" y="858" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="64">
+          <GuiSettings>
+            <Position x="1686" y="918" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="Input.Field Selection"><![CDATA[Variable1=Belegte Plätze
+Variable2=DayofWeek_DEU
+]]></Value>
+              <Value name="Enable Group By">False</Value>
+              <Value name="Select Field to Group By">Anzahl Stellplätze</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="SpearmanCorrCoeff.yxmc" />
+        </Node>
+        <Node ToolID="65">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1782" y="918" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+        <Node ToolID="66">
+          <GuiSettings>
+            <Position x="1890" y="870" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <Value name="Input.Field Selection"><![CDATA[Variable1=Diff_Taget-Lag1
+Variable2=DayofWeek_DEU
+]]></Value>
+              <Value name="Enable Group By">False</Value>
+              <Value name="Select Field to Group By">Anzahl Stellplätze</Value>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings Macro="SpearmanCorrCoeff.yxmc" />
+        </Node>
+        <Node ToolID="67">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+            <Position x="1986" y="870" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <TempFile>
+              </TempFile>
+              <TempFileDataProfiling />
+              <Layout>
+                <ViewMode>Single</ViewMode>
+                <ViewSize value="100" />
+                <View1>
+                  <DefaultTab>Profil</DefaultTab>
+                  <Hints>
+                    <Table />
+                  </Hints>
+                </View1>
+                <View2 />
+              </Layout>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+        </Node>
+      </ChildNodes>
+    </Node>
+  </Nodes>
+  <Connections>
+    <Connection>
+      <Origin ToolID="1" Connection="Output" />
+      <Destination ToolID="28" Connection="Left" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="27" Connection="Output" />
+      <Destination ToolID="28" Connection="Right" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="2" Connection="Output24" />
+      <Destination ToolID="3" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="3" Connection="Output" />
+      <Destination ToolID="26" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="5" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="7" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="32" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="35" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="37" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="39" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="40" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="41" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="42" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="47" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="48" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="51" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="50" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="57" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="59" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="62" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="64" Connection="Field Selection" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="4" Connection="True" />
+      <Destination ToolID="66" Connection="Field Selection" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="6" Connection="Output" />
+      <Destination ToolID="21" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="7" Connection="True" />
+      <Destination ToolID="8" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="7" Connection="False" />
+      <Destination ToolID="9" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="7" Connection="True" />
+      <Destination ToolID="49" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="10" Connection="Output" />
+      <Destination ToolID="11" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="11" Connection="Output" />
+      <Destination ToolID="12" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="12" Connection="Output" />
+      <Destination ToolID="13" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="13" Connection="Output" />
+      <Destination ToolID="4" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="15" Connection="Output" />
+      <Destination ToolID="16" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="16" Connection="Output" />
+      <Destination ToolID="17" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="17" Connection="Output" />
+      <Destination ToolID="18" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="18" Connection="Output" />
+      <Destination ToolID="25" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="19" Connection="Output" />
+      <Destination ToolID="15" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="21" Connection="Output" />
+      <Destination ToolID="22" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="22" Connection="Output" />
+      <Destination ToolID="23" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="23" Connection="Output" />
+      <Destination ToolID="10" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="25" Connection="Output" />
+      <Destination ToolID="6" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="26" Connection="Output" />
+      <Destination ToolID="19" Connection="Input" />
+    </Connection>
+    <Connection name="#1">
+      <Origin ToolID="28" Connection="Left" />
+      <Destination ToolID="29" Connection="Input" />
+    </Connection>
+    <Connection name="#2">
+      <Origin ToolID="28" Connection="Join" />
+      <Destination ToolID="29" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="29" Connection="Output" />
+      <Destination ToolID="30" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="29" Connection="Output" />
+      <Destination ToolID="2" Connection="Input1" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="32" Connection="Output" />
+      <Destination ToolID="33" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="32" Connection="Interactive" />
+      <Destination ToolID="34" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="35" Connection="Output" />
+      <Destination ToolID="36" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="37" Connection="Output" />
+      <Destination ToolID="38" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="39" Connection="Interactive" />
+      <Destination ToolID="43" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="40" Connection="Interactive" />
+      <Destination ToolID="44" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="41" Connection="Interactive" />
+      <Destination ToolID="45" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="42" Connection="Interactive" />
+      <Destination ToolID="46" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="47" Connection="Interactive" />
+      <Destination ToolID="56" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="48" Connection="Interactive" />
+      <Destination ToolID="55" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="49" Connection="Interactive" />
+      <Destination ToolID="54" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="50" Connection="Interactive" />
+      <Destination ToolID="53" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="51" Connection="Output" />
+      <Destination ToolID="52" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="57" Connection="Interactive" />
+      <Destination ToolID="58" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="59" Connection="Output" />
+      <Destination ToolID="60" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="62" Connection="Output" />
+      <Destination ToolID="63" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="64" Connection="Output16" />
+      <Destination ToolID="65" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="66" Connection="Output16" />
+      <Destination ToolID="67" Connection="Input" />
+    </Connection>
+  </Connections>
+  <Properties>
+    <Memory default="True" />
+    <GlobalRecordLimit value="0" />
+    <TempFiles default="True" />
+    <Annotation on="True" includeToolName="False" />
+    <ConvErrorLimit value="10" />
+    <ConvErrorLimit_Stop value="False" />
+    <CancelOnError value="False" />
+    <DisableBrowse value="False" />
+    <EnablePerformanceProfiling value="False" />
+    <PredictiveToolsCodePage value="1252" />
+    <DisableAllOutput value="False" />
+    <ShowAllMacroMessages value="False" />
+    <ShowConnectionStatusIsOn value="True" />
+    <ShowConnectionStatusOnlyWhenRunning value="True" />
+    <ZoomLevel value="0" />
+    <LayoutType>Horizontal</LayoutType>
+    <MetaInfo>
+      <NameIsFileName value="True" />
+      <Name>Zeitreihenanalyse_final</Name>
+      <Description />
+      <RootToolName />
+      <ToolVersion />
+      <ToolInDb value="False" />
+      <CategoryName />
+      <SearchTags />
+      <Author />
+      <Company />
+      <Copyright />
+      <DescriptionLink actual="" displayed="" />
+      <Example>
+        <Description />
+        <File />
+      </Example>
+      <WorkflowId value="09ae54b2-5d48-4e33-8843-527de3f1b286" />
+      <Telemetry>
+        <PreviousWorkflowId value="3f843ec6-a09c-4b27-a092-c97727b143e4" />
+        <OriginWorkflowId value="3f843ec6-a09c-4b27-a092-c97727b143e4" />
+      </Telemetry>
+    </MetaInfo>
+    <Events>
+      <Enabled value="True" />
+    </Events>
+  </Properties>
+</AlteryxDocument>
